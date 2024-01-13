@@ -4,19 +4,13 @@
   "package": "com.github.telvarost.inventorytweaks.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "AbstractClientPlayerMixin",
-    "ContainerScreenMixin",
-    "ItemInstanceMixin",
-    "LivingEntityRendererMixin",
-    "MinecraftMixin",
-    "OverlayMixin",
-    "PlayerRendererMixin",
-    "ScreenMixin",
-    "VideoSettingsScreenMixin"
+    "ContainerBaseMixin",
+    "PlayerMixin"
   ],
   "server": [
   ],
   "client": [
+    "MinecraftAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
