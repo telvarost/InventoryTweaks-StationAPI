@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "inventorytweaks",
+  "version": "${version}",
+
+  "name": "InventoryTweaks",
+  "description": "Inventory tweaks for b1.7.3 with StationAPI.",
+  "authors": [
+    "Telvarost"
+  ],
+  "contact": {
+    "issues": "https://github.com/telvarost/InventoryTweaks-StationAPI/issues",
+    "homepage": "https://github.com/telvarost/InventoryTweaks-StationAPI/",
+    "sources": "https://github.com/telvarost/InventoryTweaks-StationAPI/"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/inventorytweaks/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "stationapi:event_bus": [
+    ],
+    "stationapi:event_bus_client": [
+      "com.github.telvarost.inventorytweaks.events.init.ClientInitListener"
+    ],
+    "stationapi:event_bus_server": [
+    ],
+    "gcapi": [
+      "com.github.telvarost.inventorytweaks.Config"
+    ]
+  },
+  "mixins": [
+    "inventorytweaks.mixins.json"
+  ],
+
+  "depends": {
+    "minecraft": "1.0.0-beta.7.3"
+  }
+}
