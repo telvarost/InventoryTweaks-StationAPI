@@ -14,8 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Mixin(ContainerBase.class)
 public abstract class ContainerBaseMixin extends ScreenBase {
@@ -34,7 +33,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private Slot slot;
 
 	@Unique
-	private final Set<Slot> hoveredSlots = new HashSet<>();
+	private final List<Slot> hoveredSlots = new ArrayList<>();
 
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci)
@@ -44,8 +43,8 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 			if (cursorStack != null)
 			{
-				Slot var4 = this.getSlot(mouseX, mouseY);
-				if (!var4.hasItem())
+				Slot clickedSlot = this.getSlot(mouseX, mouseY);
+				if (clickedSlot != null && !clickedSlot.hasItem())
 				{
 					super.mouseClicked(mouseX, mouseY, button);
 					ci.cancel();
@@ -73,7 +72,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	}
 
 	@Inject(method = "mouseReleased", at = @At("RETURN"))
-	private void inventoryTweaks_mousePressed(int mouseX, int mouseY, int button, CallbackInfo ci) {
+	private void inventoryTweaks_mouseReleasedOrSlotChanged(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		System.out.println("ButtonDown = " + Mouse.isButtonDown(0) + " , button = " + button);
 		slot = this.getSlot(mouseX, mouseY);
 
@@ -91,10 +90,34 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				if (hoveredSlots.size() > 1) {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
 				}
+
+				if (hoveredSlots.size() == 2)
+				{
+					if (!hoveredSlots.get(0).hasItem())
+					{
+						this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(0).id, 1, false, this.minecraft.player);
+					}
+				}
 			}
 		} else {
 			hoveredSlots.clear();
 		}
+
+//		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+//		if (button == -1 && Mouse.isButtonDown(1) && cursorStack != null) {
+//			if (!hoveredSlots.contains(slot)) {
+//				if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(cursorStack)) {
+//					return;
+//				}
+//
+//				hoveredSlots.add(slot);
+//				if (hoveredSlots.size() > 1) {
+//					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
+//				}
+//			}
+//		} else {
+//			hoveredSlots.clear();
+//		}
 	}
 
 	@Unique
