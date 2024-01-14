@@ -37,16 +37,22 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private final Set<Slot> hoveredSlots = new HashSet<>();
 
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-	protected void mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci)
+	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci)
 	{
-		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
-		System.out.println("ButtonDown = " + Mouse.isButtonDown(0) + " , button = " + button);
-		if (button == -1 && Mouse.isButtonDown(0) && cursorStack != null)
+		if (button == 0)
 		{
+			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+			if (cursorStack != null)
+			{
+				Slot var4 = this.getSlot(mouseX, mouseY);
+				if (!var4.hasItem())
+				{
+					super.mouseClicked(mouseX, mouseY, button);
+					ci.cancel();
+				}
+			}
 		}
-//		super.mouseClicked(mouseX, mouseY, button);
 //		if (button == 0 || button == 1) {
-//			Slot var4 = this.getSlot(mouseX, mouseY);
 //			int var5 = (this.width - this.containerWidth) / 2;
 //			int var6 = (this.height - this.containerHeight) / 2;
 //			boolean var7 = mouseX < var5 || mouseY < var6 || mouseX >= var5 + this.containerWidth || mouseY >= var6 + this.containerHeight;
@@ -67,7 +73,8 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	}
 
 	@Inject(method = "mouseReleased", at = @At("RETURN"))
-	private void onMouseReleased(int mouseX, int mouseY, int button, CallbackInfo ci) {
+	private void inventoryTweaks_mousePressed(int mouseX, int mouseY, int button, CallbackInfo ci) {
+		System.out.println("ButtonDown = " + Mouse.isButtonDown(0) + " , button = " + button);
 		slot = this.getSlot(mouseX, mouseY);
 
 		if (slot == null)
@@ -94,19 +101,19 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private boolean drawingHoveredSlot;
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;isMouseOverSlot(Lnet/minecraft/container/slot/Slot;II)Z"))
-	private boolean redirectIsPointOverSlot(ContainerBase guiContainer, Slot slot, int x, int y) {
+	private boolean inventoryTweaks_isMouseOverSlot(ContainerBase guiContainer, Slot slot, int x, int y) {
 		return (drawingHoveredSlot = hoveredSlots.contains(slot)) || isMouseOverSlot(slot, x, y);
 	}
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;fillGradient(IIIIII)V", ordinal = 0))
-	private void redirectFillGradient(ContainerBase instance, int startX, int startY, int endX, int endY, int colorStart, int colorEnd) {
+	private void inventoryTweaks_fillGradient(ContainerBase instance, int startX, int startY, int endX, int endY, int colorStart, int colorEnd) {
 		if (colorStart != colorEnd) throw new AssertionError();
 		int color = drawingHoveredSlot ? 0x20ffffff : colorStart;
 		this.fillGradient(startX, startY, endX, endY, color, color);
 	}
 
 	@Inject(method = "keyPressed", at = @At("RETURN"))
-	private void onKeyPressed(char character, int keyCode, CallbackInfo ci) {
+	private void inventoryTweaks_keyPressed(char character, int keyCode, CallbackInfo ci) {
 		if (this.slot == null)
 			return;
 

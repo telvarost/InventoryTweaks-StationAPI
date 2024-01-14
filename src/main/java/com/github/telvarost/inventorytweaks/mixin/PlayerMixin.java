@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin({ClientPlayer.class, PlayerBase.class})
 public abstract class PlayerMixin {
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
-    private void onDropSelectedItem(CallbackInfo ci) {
+    private void inventoryTweaks_dropSelectedItem(CallbackInfo ci) {
         if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
             Minecraft minecraft = MinecraftAccessor.getInstance();
             PlayerBase playerBase = (PlayerBase) (Object) this;
