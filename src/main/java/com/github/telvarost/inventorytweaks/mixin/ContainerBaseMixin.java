@@ -28,9 +28,23 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	protected abstract boolean isMouseOverSlot(Slot slot, int x, int Y);
 
 	@Shadow protected int containerWidth;
+
 	@Shadow protected int containerHeight;
+
 	@Unique
 	private Slot slot;
+
+	@Unique
+	private ItemInstance currentDragStack;
+
+	@Unique
+	private ItemInstance persistentStack;
+
+	@Unique
+	private int itemAmount;
+
+	@Unique
+	private boolean dragStarted = false;
 
 	@Unique
 	private final List<Slot> hoveredSlots = new ArrayList<>();
@@ -73,35 +87,89 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Inject(method = "mouseReleased", at = @At("RETURN"))
 	private void inventoryTweaks_mouseReleasedOrSlotChanged(int mouseX, int mouseY, int button, CallbackInfo ci) {
-		System.out.println("ButtonDown = " + Mouse.isButtonDown(0) + " , button = " + button);
 		slot = this.getSlot(mouseX, mouseY);
 
 		if (slot == null)
 			return;
 
 		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
-		if (button == -1 && Mouse.isButtonDown(0) && cursorStack != null) {
-			if (!hoveredSlots.contains(slot)) {
-				if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(cursorStack)) {
-					return;
-				}
+		if (button == -1 && Mouse.isButtonDown(0)) {
+//			if (currentDragStack != null && cursorStack == null)
+//			{
+////				for (int reclaimItemsIndex = 0; reclaimItemsIndex < hoveredSlots.size(); reclaimItemsIndex++)
+////				{
+//					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(0).id, 0, false, this.minecraft.player);
+//				//}
+//			}
 
-				hoveredSlots.add(slot);
 
-				if (hoveredSlots.size() == 2)
-				{
-					if (!hoveredSlots.get(0).hasItem())
+			if (cursorStack != null && currentDragStack == null && dragStarted == false)
+			{
+				currentDragStack = cursorStack;
+				persistentStack = cursorStack;
+				itemAmount = currentDragStack.count;
+				dragStarted = true;
+			}
+
+			if (persistentStack != null)
+			{
+				if (!hoveredSlots.contains(slot)) {
+					if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(persistentStack)) {
+						return;
+					}
+
+					hoveredSlots.add(slot);
+
+					int itemsPerSlot = itemAmount / hoveredSlots.size();
+
+					for (int hoveredSlotsIndex = 0; hoveredSlotsIndex < (hoveredSlots.size() - 1); hoveredSlotsIndex++)
 					{
-						this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(0).id, 1, false, this.minecraft.player);
+						cursorStack = minecraft.player.inventory.getCursorItem();
+						if (hoveredSlots.get(hoveredSlotsIndex).hasItem() && hoveredSlots.size() > 1)
+						{
+							if (cursorStack == null)
+							{
+								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(hoveredSlotsIndex).id, 0, false, this.minecraft.player);
+							}
+							else
+							{
+								System.out.println("Double Click Slot: " + hoveredSlotsIndex);
+								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(hoveredSlotsIndex).id, 0, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(hoveredSlotsIndex).id, 0, false, this.minecraft.player);
+							}
+						}
+					}
+
+					if (hoveredSlots.size() > 1) {
+
+						for (int distributeSlotsIndex = 0; distributeSlotsIndex < (hoveredSlots.size() - 1); distributeSlotsIndex++)
+						{
+							if (!hoveredSlots.get(distributeSlotsIndex).hasItem())
+							{
+								for (int addFirstSlotIndex = 0; addFirstSlotIndex < itemsPerSlot; addFirstSlotIndex++)
+								{
+									this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(distributeSlotsIndex).id, 1, false, this.minecraft.player);
+								}
+							}
+						}
+
+						for (int addToSlotIndex = 0; addToSlotIndex < itemsPerSlot; addToSlotIndex++)
+						{
+							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
+						}
 					}
 				}
-
-				if (hoveredSlots.size() > 1) {
-					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
-				}
 			}
+//			else
+//			{
+//				currentDragStack = null;
+//				hoveredSlots.clear();
+//			}
 		} else {
+			currentDragStack = null;
 			hoveredSlots.clear();
+			itemAmount = 0;
+			dragStarted = false;
 		}
 
 //		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
