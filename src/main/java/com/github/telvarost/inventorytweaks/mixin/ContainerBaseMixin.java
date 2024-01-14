@@ -87,9 +87,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				}
 
 				hoveredSlots.add(slot);
-				if (hoveredSlots.size() > 1) {
-					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
-				}
 
 				if (hoveredSlots.size() == 2)
 				{
@@ -97,6 +94,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					{
 						this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(0).id, 1, false, this.minecraft.player);
 					}
+				}
+
+				if (hoveredSlots.size() > 1) {
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
 				}
 			}
 		} else {
