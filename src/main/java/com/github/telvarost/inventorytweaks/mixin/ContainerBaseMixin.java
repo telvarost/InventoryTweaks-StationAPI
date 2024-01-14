@@ -35,9 +35,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private Slot slot;
 
 	@Unique
-	private ItemInstance currentDragStack;
-
-	@Unique
 	private ItemInstance persistentStack;
 
 	@Unique
@@ -63,11 +60,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					super.mouseClicked(mouseX, mouseY, button);
 
 
-					if (cursorStack != null && currentDragStack == null && dragStarted == false)
+					if (cursorStack != null && persistentStack == null && dragStarted == false)
 					{
-						currentDragStack = cursorStack;
 						persistentStack = cursorStack;
-						itemAmount = currentDragStack.count;
+						itemAmount = persistentStack.count;
 						dragStarted = true;
 					}
 
@@ -103,15 +99,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		if (slot == null)
 			return;
 
-		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+		ItemInstance cursorStack;
+
 		if (button == -1 && Mouse.isButtonDown(0)) {
-//			if (currentDragStack != null && cursorStack == null)
-//			{
-////				for (int reclaimItemsIndex = 0; reclaimItemsIndex < hoveredSlots.size(); reclaimItemsIndex++)
-////				{
-//					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(0).id, 0, false, this.minecraft.player);
-//				//}
-//			}
 
 			if (persistentStack != null)
 			{
@@ -143,7 +133,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 					if (hoveredSlots.size() > 1) {
 
-						for (int distributeSlotsIndex = 0; distributeSlotsIndex < (hoveredSlots.size() - 1); distributeSlotsIndex++)
+						for (int distributeSlotsIndex = 0; distributeSlotsIndex < hoveredSlots.size(); distributeSlotsIndex++)
 						{
 							if (!hoveredSlots.get(distributeSlotsIndex).hasItem())
 							{
@@ -153,21 +143,17 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 								}
 							}
 						}
-
-						for (int addToSlotIndex = 0; addToSlotIndex < itemsPerSlot; addToSlotIndex++)
-						{
-							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
-						}
 					}
 				}
 			}
-//			else
-//			{
-//				currentDragStack = null;
-//				hoveredSlots.clear();
-//			}
+			else
+			{
+				hoveredSlots.clear();
+				itemAmount = 0;
+				dragStarted = false;
+			}
 		} else {
-			currentDragStack = null;
+			persistentStack = null;
 			hoveredSlots.clear();
 			itemAmount = 0;
 			dragStarted = false;
