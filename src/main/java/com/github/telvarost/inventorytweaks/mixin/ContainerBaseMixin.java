@@ -61,6 +61,17 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				if (clickedSlot != null && !clickedSlot.hasItem())
 				{
 					super.mouseClicked(mouseX, mouseY, button);
+
+
+					if (cursorStack != null && currentDragStack == null && dragStarted == false)
+					{
+						currentDragStack = cursorStack;
+						persistentStack = cursorStack;
+						itemAmount = currentDragStack.count;
+						dragStarted = true;
+					}
+
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
 					ci.cancel();
 				}
 			}
@@ -102,15 +113,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 //				//}
 //			}
 
-
-			if (cursorStack != null && currentDragStack == null && dragStarted == false)
-			{
-				currentDragStack = cursorStack;
-				persistentStack = cursorStack;
-				itemAmount = currentDragStack.count;
-				dragStarted = true;
-			}
-
 			if (persistentStack != null)
 			{
 				if (!hoveredSlots.contains(slot)) {
@@ -133,7 +135,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							}
 							else
 							{
-								System.out.println("Double Click Slot: " + hoveredSlotsIndex);
 								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(hoveredSlotsIndex).id, 0, false, this.minecraft.player);
 								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, hoveredSlots.get(hoveredSlotsIndex).id, 0, false, this.minecraft.player);
 							}
