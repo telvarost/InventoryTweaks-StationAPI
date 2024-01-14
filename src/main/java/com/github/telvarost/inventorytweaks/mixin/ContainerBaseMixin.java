@@ -28,11 +28,43 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	@Shadow
 	protected abstract boolean isMouseOverSlot(Slot slot, int x, int Y);
 
+	@Shadow protected int containerWidth;
+	@Shadow protected int containerHeight;
 	@Unique
 	private Slot slot;
 
 	@Unique
 	private final Set<Slot> hoveredSlots = new HashSet<>();
+
+	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+	protected void mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci)
+	{
+		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+		System.out.println("ButtonDown = " + Mouse.isButtonDown(0) + " , button = " + button);
+		if (button == -1 && Mouse.isButtonDown(0) && cursorStack != null)
+		{
+		}
+//		super.mouseClicked(mouseX, mouseY, button);
+//		if (button == 0 || button == 1) {
+//			Slot var4 = this.getSlot(mouseX, mouseY);
+//			int var5 = (this.width - this.containerWidth) / 2;
+//			int var6 = (this.height - this.containerHeight) / 2;
+//			boolean var7 = mouseX < var5 || mouseY < var6 || mouseX >= var5 + this.containerWidth || mouseY >= var6 + this.containerHeight;
+//			int var8 = -1;
+//			if (var4 != null) {
+//				var8 = var4.id;
+//			}
+//
+//			if (var7) {
+//				var8 = -999;
+//			}
+//
+//			if (var8 != -1) {
+//				boolean var9 = var8 != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
+//				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, var8, button, var9, this.minecraft.player);
+//			}
+//		}
+	}
 
 	@Inject(method = "mouseReleased", at = @At("RETURN"))
 	private void onMouseReleased(int mouseX, int mouseY, int button, CallbackInfo ci) {
@@ -42,7 +74,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			return;
 
 		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
-		if (button == -1 && Mouse.isButtonDown(1) && cursorStack != null) {
+		if (button == -1 && Mouse.isButtonDown(0) && cursorStack != null) {
 			if (!hoveredSlots.contains(slot)) {
 				if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(cursorStack)) {
 					return;
