@@ -96,7 +96,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			if (cursorStack != null)
 			{
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
-				if (clickedSlot != null && !clickedSlot.hasItem())
+				if (clickedSlot != null)
 				{
 					super.mouseClicked(mouseX, mouseY, button);
 
