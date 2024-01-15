@@ -36,10 +36,16 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private Slot slot;
 
 	@Unique
-	private ItemInstance persistentStack;
+	private int leftClickItemAmount;
 
 	@Unique
-	private int itemAmount;
+	private int rightClickItemAmount;
+
+	@Unique
+	private ItemInstance leftClickPersistentStack;
+
+	@Unique
+	private ItemInstance rightClickPersistentStack;
 
 	@Unique
 	private boolean isLeftClickDragStarted = false;
@@ -57,14 +63,16 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	{
 		if (button == 1)
 		{
+			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+
 			if (isLeftClickDragStarted)
 			{
-				ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
-
 				if (leftClickHoveredSlots.size() > 1) {
+					super.mouseClicked(mouseX, mouseY, button);
 
 					for (int distributeSlotsIndex = 0; distributeSlotsIndex < leftClickHoveredSlots.size(); distributeSlotsIndex++)
 					{
+						cursorStack = minecraft.player.inventory.getCursorItem();
 						if (leftClickHoveredSlots.get(distributeSlotsIndex).hasItem())
 						{
 							if (cursorStack != null)
@@ -76,40 +84,14 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					}
 
-					persistentStack = null;
+					leftClickPersistentStack = null;
 					leftClickHoveredSlots.clear();
-					itemAmount = 0;
+					leftClickItemAmount = 0;
 					isLeftClickDragStarted = false;
 					ci.cancel();
+					return;
 				}
 			}
-		}
-
-		if (button == 0)
-		{
-			if (isRightClickDragStarted)
-			{
-				ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
-
-				if (rightClickHoveredSlots.size() > 1) {
-
-					for (int distributeSlotsIndex = 0; distributeSlotsIndex < rightClickHoveredSlots.size(); distributeSlotsIndex++) {
-						if (rightClickHoveredSlots.get(distributeSlotsIndex).hasItem()) {
-							if (cursorStack != null) {
-								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, rightClickHoveredSlots.get(distributeSlotsIndex).id, 0, false, this.minecraft.player);
-							}
-
-							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, rightClickHoveredSlots.get(distributeSlotsIndex).id, 0, false, this.minecraft.player);
-						}
-					}
-
-					rightClickHoveredSlots.clear();
-					isRightClickDragStarted = false;
-				}
-			}
-
-			System.out.println("Left button click");
-			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
 			if (cursorStack != null)
 			{
@@ -118,37 +100,71 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				{
 					super.mouseClicked(mouseX, mouseY, button);
 
-
-					if (cursorStack != null && persistentStack == null && isLeftClickDragStarted == false)
+					if (cursorStack != null && rightClickPersistentStack == null && isRightClickDragStarted == false)
 					{
-						persistentStack = cursorStack;
-						itemAmount = persistentStack.count;
+						rightClickPersistentStack = cursorStack;
+						rightClickItemAmount = rightClickPersistentStack.count;
+						isRightClickDragStarted = true;
+					}
+
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 1, false, this.minecraft.player);
+					ci.cancel();
+					return;
+				}
+			}
+		}
+
+		if (button == 0)
+		{
+			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+
+			if (isRightClickDragStarted)
+			{
+				if (rightClickHoveredSlots.size() > 1) {
+					super.mouseClicked(mouseX, mouseY, button);
+
+					for (int distributeSlotsIndex = 0; distributeSlotsIndex < rightClickHoveredSlots.size(); distributeSlotsIndex++)
+					{
+						cursorStack = minecraft.player.inventory.getCursorItem();
+						if (rightClickHoveredSlots.get(distributeSlotsIndex).hasItem())
+						{
+							if (cursorStack != null)
+							{
+								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, rightClickHoveredSlots.get(distributeSlotsIndex).id, 0, false, this.minecraft.player);
+							}
+
+							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, rightClickHoveredSlots.get(distributeSlotsIndex).id, 0, false, this.minecraft.player);
+						}
+					}
+
+					rightClickHoveredSlots.clear();
+					rightClickItemAmount = 0;
+					isRightClickDragStarted = false;
+					ci.cancel();
+					return;
+				}
+			}
+
+			if (cursorStack != null)
+			{
+				Slot clickedSlot = this.getSlot(mouseX, mouseY);
+				if (clickedSlot != null && !clickedSlot.hasItem())
+				{
+					super.mouseClicked(mouseX, mouseY, button);
+
+					if (cursorStack != null && leftClickPersistentStack == null && isLeftClickDragStarted == false)
+					{
+						leftClickPersistentStack = cursorStack;
+						leftClickItemAmount = leftClickPersistentStack.count;
 						isLeftClickDragStarted = true;
 					}
 
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
 					ci.cancel();
+					return;
 				}
 			}
 		}
-//		if (button == 0 || button == 1) {
-//			int var5 = (this.width - this.containerWidth) / 2;
-//			int var6 = (this.height - this.containerHeight) / 2;
-//			boolean var7 = mouseX < var5 || mouseY < var6 || mouseX >= var5 + this.containerWidth || mouseY >= var6 + this.containerHeight;
-//			int var8 = -1;
-//			if (var4 != null) {
-//				var8 = var4.id;
-//			}
-//
-//			if (var7) {
-//				var8 = -999;
-//			}
-//
-//			if (var8 != -1) {
-//				boolean var9 = var8 != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
-//				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, var8, button, var9, this.minecraft.player);
-//			}
-//		}
 	}
 
 	@Inject(method = "mouseReleased", at = @At("RETURN"), cancellable = true)
@@ -158,24 +174,27 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		if (slot == null)
 			return;
 
-		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
-
 		if (button == -1 && Mouse.isButtonDown(0) && isRightClickDragStarted == false) {
 
-			if (persistentStack != null)
+			if (leftClickPersistentStack != null)
 			{
 				if (!leftClickHoveredSlots.contains(slot)) {
-					if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(persistentStack)) {
+					if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(leftClickPersistentStack)) {
+						return;
+					}
+
+					if (1.0 == (double)leftClickItemAmount / (double)leftClickHoveredSlots.size())
+					{
 						return;
 					}
 
 					leftClickHoveredSlots.add(slot);
 
-					int itemsPerSlot = itemAmount / leftClickHoveredSlots.size();
+					int itemsPerSlot = leftClickItemAmount / leftClickHoveredSlots.size();
 
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < (leftClickHoveredSlots.size() - 1); leftClickHoveredSlotsIndex++)
 					{
-						cursorStack = minecraft.player.inventory.getCursorItem();
+						ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 						if (leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).hasItem() && leftClickHoveredSlots.size() > 1)
 						{
 							if (cursorStack != null)
@@ -205,38 +224,45 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			else
 			{
 				leftClickHoveredSlots.clear();
-				itemAmount = 0;
+				leftClickItemAmount = 0;
 				isLeftClickDragStarted = false;
 			}
 		} else {
-			persistentStack = null;
+			leftClickPersistentStack = null;
 			leftClickHoveredSlots.clear();
-			itemAmount = 0;
+			leftClickItemAmount = 0;
 			isLeftClickDragStarted = false;
 		}
 
 		if (button == -1 && Mouse.isButtonDown(1) && isLeftClickDragStarted == false)  {
 
-			if (cursorStack != null)
+			if (rightClickPersistentStack != null)
 			{
-				isRightClickDragStarted = true;
-
 				if (!rightClickHoveredSlots.contains(slot)) {
-					if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(cursorStack)) {
+					if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(rightClickPersistentStack)) {
+						return;
+					}
+
+					if (1.0 == (double)rightClickItemAmount / (double)rightClickHoveredSlots.size())
+					{
 						return;
 					}
 
 					rightClickHoveredSlots.add(slot);
+
 					if (rightClickHoveredSlots.size() > 1) {
 						this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
 					}
 				}
 			} else {
 				rightClickHoveredSlots.clear();
+				rightClickItemAmount = 0;
 				isRightClickDragStarted = false;
 			}
 		} else {
+			rightClickPersistentStack = null;
 			rightClickHoveredSlots.clear();
+			rightClickItemAmount = 0;
 			isRightClickDragStarted = false;
 		}
 	}
