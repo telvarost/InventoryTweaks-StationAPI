@@ -58,6 +58,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Unique final List<Slot> rightClickHoveredSlots = new ArrayList<>();
 
+	@Unique final List<ItemInstance> leftClickSlotItems = new ArrayList<>();
+
+	@Unique final List<ItemInstance> rightClickSlotItems = new ArrayList<>();
+
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci)
 	{
@@ -163,6 +167,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
 						ci.cancel();
 						return;
+					}
+					else
+					{
+						ItemInstance firstRightClickSlotItem = clickedSlot.getItem();
+
+						//leftClickSlotItems.add(firstRightClickSlotItem);
+
+//						firstRightClickSlotItem.getMaxStackSize();
+//						firstRightClickSlotItem.count
 					}
 				}
 			}
