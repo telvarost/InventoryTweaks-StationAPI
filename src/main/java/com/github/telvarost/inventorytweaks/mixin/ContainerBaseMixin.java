@@ -36,36 +36,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private Slot slot;
 
 	@Unique
-	private int leftClickMaxStackSize;
-
-	@Unique
-	private int rightClickMaxStackSize;
-
-	@Unique
-	private int leftClickNumberOfSlotsWithItems;
-
-	@Unique
-	private int rightClickNumberOfSlotsWithItems;
-
-	@Unique
-	private int leftClickAmountToFill;
-
-	@Unique
-	private int rightClickAmountToFill;
-
-	@Unique
-	private int leftClickExistingAmount;
-
-	@Unique
-	private int rightClickExistingAmount;
-
-	@Unique
-	private int leftClickItemAmount;
-
-	@Unique
-	private int rightClickItemAmount;
-
-	@Unique
 	private ItemInstance leftClickPersistentStack;
 
 	@Unique
@@ -82,9 +52,21 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Unique final List<Slot> rightClickHoveredSlots = new ArrayList<>();
 
-	@Unique final List<ItemInstance> leftClickSlotItems = new ArrayList<>();
+	@Unique ItemInstance leftClickDragItemType;
 
-	@Unique final List<ItemInstance> rightClickSlotItems = new ArrayList<>();
+	@Unique ItemInstance rightClickDragItemType;
+
+	@Unique Integer leftClickItemAmount;
+
+	@Unique Integer rightClickItemAmount;
+
+	@Unique final List<Integer> leftClickExistingAmount = new ArrayList<>();
+
+	@Unique final List<Integer> rightClickExistingAmount = new ArrayList<>();
+
+	@Unique final List<Integer> leftClickAmountToFill = new ArrayList<>();
+
+	@Unique final List<Integer> rightClickAmountToFill = new ArrayList<>();
 
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci)
@@ -112,9 +94,11 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					}
 
+					/** - New */ leftClickExistingAmount.clear();
+					/** - New */ leftClickAmountToFill.clear();
+					/** - New */ leftClickDragItemType = null;
 					leftClickPersistentStack = null;
 					leftClickHoveredSlots.clear();
-					leftClickItemAmount = 0;
 					isLeftClickDragStarted = false;
 					ci.cancel();
 					return;
@@ -228,49 +212,29 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 
 					leftClickHoveredSlots.add(slot);
-					leftClickSlotItems.add(slot.getItem());
 					ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
-					if (1 == leftClickSlotItems.size())
+					ItemInstance slotToExamine = slot.getItem();
+					if (null != slotToExamine)
 					{
-						leftClickNumberOfSlotsWithItems = 0;
-						leftClickExistingAmount = 0;
-						leftClickAmountToFill = 0;
-
-						if (null != cursorStack)
-						{
-							leftClickMaxStackSize = cursorStack.getMaxStackSize();
-						}
-						else
-						{
-							leftClickMaxStackSize = 0;
-						}
+						leftClickAmountToFill.add(slotToExamine.getMaxStackSize() - slotToExamine.count);
+						leftClickExistingAmount.add(slotToExamine.count);
 					}
 
-					if (slot.hasItem())
+					if (null == leftClickDragItemType && null != cursorStack)
 					{
-						leftClickNumberOfSlotsWithItems++;
-					}
-
-					for (int checkExistingItemCountIndex = 0; checkExistingItemCountIndex < leftClickSlotItems.size(); checkExistingItemCountIndex++)
-					{
-						ItemInstance currentItemToCheck =  leftClickSlotItems.get(checkExistingItemCountIndex);
-
-						if (null != currentItemToCheck)
-						{
-							leftClickExistingAmount += currentItemToCheck.count;
-							leftClickAmountToFill += leftClickMaxStackSize - currentItemToCheck.count;
-						}
+						leftClickDragItemType = cursorStack;
 					}
 
 					int itemsPerSlot = leftClickItemAmount / leftClickHoveredSlots.size();
-					int subtractItemsFromDistribution = leftClickAmountToFill / leftClickNumberOfSlotsWithItems;
-					int distributionOverEmptySlots = (leftClickItemAmount - leftClickAmountToFill) / (leftClickHoveredSlots.size() - leftClickNumberOfSlotsWithItems);
 
-//					int itemsPerSlotWithExistingItems = (leftClickExistingAmount + leftClickItemAmount) / leftClickHoveredSlots.size();
-//					if (itemsPerSlotWithExistingItems > leftClickMaxStackSize)
-//					{
-//					}
+					for (int slotsToCheckIndex = 0; slotsToCheckIndex < leftClickAmountToFill.size(); slotsToCheckIndex++)
+					{
+						if (leftClickAmountToFill.get(slotsToCheckIndex) < itemsPerSlot)
+						{
+							/** - Just fill the slot and return */
+						}
+					}
 
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < (leftClickHoveredSlots.size() - 1); leftClickHoveredSlotsIndex++)
 					{
