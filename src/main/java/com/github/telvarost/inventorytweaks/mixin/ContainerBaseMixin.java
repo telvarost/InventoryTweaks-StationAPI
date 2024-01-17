@@ -148,20 +148,22 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			if (cursorStack != null)
 			{
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
-				if (clickedSlot != null && !clickedSlot.hasItem())
+				if (clickedSlot != null)
 				{
-					super.mouseClicked(mouseX, mouseY, button);
-
-					if (cursorStack != null && leftClickPersistentStack == null && isLeftClickDragStarted == false)
+					if (!clickedSlot.hasItem())
 					{
-						leftClickPersistentStack = cursorStack;
-						leftClickItemAmount = leftClickPersistentStack.count;
-						isLeftClickDragStarted = true;
-					}
+						super.mouseClicked(mouseX, mouseY, button);
 
-					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
-					ci.cancel();
-					return;
+						if (cursorStack != null && leftClickPersistentStack == null && isLeftClickDragStarted == false) {
+							leftClickPersistentStack = cursorStack;
+							leftClickItemAmount = leftClickPersistentStack.count;
+							isLeftClickDragStarted = true;
+						}
+
+						this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
+						ci.cancel();
+						return;
+					}
 				}
 			}
 		}
