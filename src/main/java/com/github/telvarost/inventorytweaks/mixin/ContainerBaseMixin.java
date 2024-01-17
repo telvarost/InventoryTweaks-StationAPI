@@ -36,6 +36,30 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private Slot slot;
 
 	@Unique
+	private int leftClickMaxStackSize;
+
+	@Unique
+	private int rightClickMaxStackSize;
+
+	@Unique
+	private int leftClickNumberOfSlotsWithItems;
+
+	@Unique
+	private int rightClickNumberOfSlotsWithItems;
+
+	@Unique
+	private int leftClickAmountToFill;
+
+	@Unique
+	private int rightClickAmountToFill;
+
+	@Unique
+	private int leftClickExistingAmount;
+
+	@Unique
+	private int rightClickExistingAmount;
+
+	@Unique
 	private int leftClickItemAmount;
 
 	@Unique
@@ -168,15 +192,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						ci.cancel();
 						return;
 					}
-					else
-					{
-						ItemInstance firstRightClickSlotItem = clickedSlot.getItem();
-
-						//leftClickSlotItems.add(firstRightClickSlotItem);
-
+//					else
+//					{
+//						ItemInstance firstRightClickSlotItem = clickedSlot.getItem();
+//
+//						leftClickSlotItems.add(firstRightClickSlotItem);
+//
 //						firstRightClickSlotItem.getMaxStackSize();
 //						firstRightClickSlotItem.count
-					}
+//					}
 				}
 			}
 		}
@@ -204,15 +228,56 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 
 					leftClickHoveredSlots.add(slot);
+					leftClickSlotItems.add(slot.getItem());
+					ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+
+					if (1 == leftClickSlotItems.size())
+					{
+						leftClickNumberOfSlotsWithItems = 0;
+						leftClickExistingAmount = 0;
+						leftClickAmountToFill = 0;
+
+						if (null != cursorStack)
+						{
+							leftClickMaxStackSize = cursorStack.getMaxStackSize();
+						}
+						else
+						{
+							leftClickMaxStackSize = 0;
+						}
+					}
+
+					if (slot.hasItem())
+					{
+						leftClickNumberOfSlotsWithItems++;
+					}
+
+					for (int checkExistingItemCountIndex = 0; checkExistingItemCountIndex < leftClickSlotItems.size(); checkExistingItemCountIndex++)
+					{
+						ItemInstance currentItemToCheck =  leftClickSlotItems.get(checkExistingItemCountIndex);
+
+						if (null != currentItemToCheck)
+						{
+							leftClickExistingAmount += currentItemToCheck.count;
+							leftClickAmountToFill += leftClickMaxStackSize - currentItemToCheck.count;
+						}
+					}
 
 					int itemsPerSlot = leftClickItemAmount / leftClickHoveredSlots.size();
+					int subtractItemsFromDistribution = leftClickAmountToFill / leftClickNumberOfSlotsWithItems;
+					int distributionOverEmptySlots = (leftClickItemAmount - leftClickAmountToFill) / (leftClickHoveredSlots.size() - leftClickNumberOfSlotsWithItems);
+
+//					int itemsPerSlotWithExistingItems = (leftClickExistingAmount + leftClickItemAmount) / leftClickHoveredSlots.size();
+//					if (itemsPerSlotWithExistingItems > leftClickMaxStackSize)
+//					{
+//					}
 
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < (leftClickHoveredSlots.size() - 1); leftClickHoveredSlotsIndex++)
 					{
-						ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+						cursorStack = minecraft.player.inventory.getCursorItem();
 						if (leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).hasItem() && leftClickHoveredSlots.size() > 1)
 						{
-							if (cursorStack != null)
+							if (null != cursorStack)
 							{
 								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
 							}
