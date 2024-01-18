@@ -178,7 +178,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 			if (leftClickPersistentStack != null) {
 				if (!leftClickHoveredSlots.contains(slot)) {
-					if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(leftClickPersistentStack)) {
+					ItemInstance slotToItemExamine = slot.getItem();
+					
+					if (null != slotToItemExamine && !slotToItemExamine.isDamageAndIDIdentical(leftClickPersistentStack)) {
 						return;
 					}
 
@@ -188,13 +190,12 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 					leftClickHoveredSlots.add(slot);
 					ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
-					ItemInstance slotToExamine = slot.getItem();
 					List<Integer> leftClickAmountToFill = new ArrayList<>();
 
-					if (null != slotToExamine) {
-						leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotToExamine.count);
+					if (null != slotToItemExamine) {
+						leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotToItemExamine.count);
 						leftClickAmountToFill.clear();
-						leftClickExistingAmount.add(slotToExamine.count);
+						leftClickExistingAmount.add(slotToItemExamine.count);
 					}
 					else
 					{
