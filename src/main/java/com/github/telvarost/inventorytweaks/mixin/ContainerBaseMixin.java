@@ -85,9 +85,13 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
+
+		/** - Right-click */
 		if (button == 1) {
+			/** - Get held item */
 			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
+			/** - Cancel Left-click + Drag */
 			if (isLeftClickDragStarted) {
 				if (leftClickHoveredSlots.size() > 1) {
 					super.mouseClicked(mouseX, mouseY, button);
@@ -125,9 +129,12 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			}
 		}
 
+		/** - Left-click */
 		if (button == 0) {
+			/** - Get held item */
 			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
+			/** - Cancel Right-click + Drag */
 			if (isRightClickDragStarted) {
 				if (rightClickHoveredSlots.size() > 1) {
 					super.mouseClicked(mouseX, mouseY, button);
@@ -186,6 +193,37 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		/** - Do nothing if mouse is not over a slot */
 		if (slot == null)
 			return;
+
+		/** - Right-click + Drag logic = distribute one item from held items to each slot */
+		if (  ( button == -1 )
+		   && ( Mouse.isButtonDown(1) )
+		   && ( isLeftClickDragStarted == false )
+		   && ( rightClickPersistentStack != null )
+		   )
+		{
+			/** - Do nothing if slot has already been added to Right-click + Drag logic */
+			if (!rightClickHoveredSlots.contains(slot)) {
+				/** - Do nothing if slot item does not match held item */
+				if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(rightClickPersistentStack)) {
+					return;
+				}
+
+				/** - Do nothing if there are no more items to distribute */
+				if (1.0 == (double)rightClickItemAmount / (double)rightClickHoveredSlots.size()) {
+					return;
+				}
+
+				/** - Add slot to item distribution */
+				rightClickHoveredSlots.add(slot);
+
+				/** - Distribute one item to the slot (first slot happens instantly in mouseClicked function) */
+				if (rightClickHoveredSlots.size() > 1) {
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
+				}
+			}
+		} else {
+			inventoryTweaks_resetRightClickDragVariables();
+		}
 
 		/** - Left-click + Drag logic = evenly distribute held items over slots */
 		if (  ( button == -1 )
@@ -278,37 +316,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			}
 		} else {
 			inventoryTweaks_resetLeftClickDragVariables();
-		}
-
-		/** - Right-click + Drag logic = distribute one item from held items to each slot */
-		if (  ( button == -1 )
-		   && ( Mouse.isButtonDown(1) )
-		   && ( isLeftClickDragStarted == false )
-		   && ( rightClickPersistentStack != null )
-		   )
-		{
-			/** - Do nothing if slot has already been added to Right-click + Drag logic */
-			if (!rightClickHoveredSlots.contains(slot)) {
-				/** - Do nothing if slot item does not match held item */
-				if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(rightClickPersistentStack)) {
-					return;
-				}
-
-				/** - Do nothing if there are no more items to distribute */
-				if (1.0 == (double)rightClickItemAmount / (double)rightClickHoveredSlots.size()) {
-					return;
-				}
-
-				/** - Add slot to item distribution */
-				rightClickHoveredSlots.add(slot);
-
-				/** - Distribute one item to the slot (first slot happens instantly in mouseClicked function) */
-				if (rightClickHoveredSlots.size() > 1) {
-					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
-				}
-			}
-		} else {
-			inventoryTweaks_resetRightClickDragVariables();
 		}
 	}
 
