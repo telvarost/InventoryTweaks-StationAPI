@@ -69,16 +69,17 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	{
 		leftClickExistingAmount.clear();
 		leftClickAmountToFillPersistent.clear();
-		leftClickPersistentStack = null;
 		leftClickHoveredSlots.clear();
+		leftClickPersistentStack = null;
 		leftClickItemAmount = 0;
 		isLeftClickDragStarted = false;
 	}
 
 	@Unique private void inventoryTweaks_resetRightClickDragVariables()
 	{
-		rightClickPersistentStack = null;
+		rightClickExistingAmount.clear();
 		rightClickHoveredSlots.clear();
+		rightClickPersistentStack = null;
 		rightClickItemAmount = 0;
 		isRightClickDragStarted = false;
 	}
@@ -149,15 +150,12 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					super.mouseClicked(mouseX, mouseY, button);
 
 					/** - Return all slots to normal */
-					// Logic is currently broken here. Slot items are collected, when instead they need to be returned to normal
-					for (int distributeSlotsIndex = 0; distributeSlotsIndex < rightClickHoveredSlots.size(); distributeSlotsIndex++) {
-						cursorStack = minecraft.player.inventory.getCursorItem();
-						if (rightClickHoveredSlots.get(distributeSlotsIndex).hasItem()) {
-							if (cursorStack != null) {
-								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, rightClickHoveredSlots.get(distributeSlotsIndex).id, 0, false, this.minecraft.player);
-							}
-
-							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, rightClickHoveredSlots.get(distributeSlotsIndex).id, 0, false, this.minecraft.player);
+					minecraft.player.inventory.setCursorItem(new ItemInstance(rightClickPersistentStack.itemId, rightClickItemAmount, rightClickPersistentStack.getDamage()));
+					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < rightClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
+						if (0 != rightClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
+							rightClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(rightClickPersistentStack.itemId, rightClickExistingAmount.get(leftClickHoveredSlotsIndex), rightClickPersistentStack.getDamage()));
+						} else {
+							rightClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
 						}
 					}
 
@@ -220,8 +218,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		{
 			/** - Do nothing if slot has already been added to Right-click + Drag logic */
 			if (!rightClickHoveredSlots.contains(slot)) {
+				ItemInstance slotToItemExamine = slot.getItem();
+
 				/** - Do nothing if slot item does not match held item */
-				if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(rightClickPersistentStack)) {
+				if (null != slotToItemExamine && !slotToItemExamine.isDamageAndIDIdentical(rightClickPersistentStack)) {
 					return;
 				}
 
@@ -232,6 +232,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 				/** - Add slot to item distribution */
 				rightClickHoveredSlots.add(slot);
+
+				/** - Record how many items are in the slot */
+				if (null != slotToItemExamine) {
+					rightClickExistingAmount.add(slotToItemExamine.count);
+				}
+				else
+				{
+					rightClickExistingAmount.add(0);
+				}
 
 				/** - Distribute one item to the slot (first slot happens instantly in mouseClicked function) */
 				if (rightClickHoveredSlots.size() > 1) {
