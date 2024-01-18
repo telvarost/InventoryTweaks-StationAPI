@@ -198,10 +198,12 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			if (!leftClickHoveredSlots.contains(slot)) {
 				ItemInstance slotToItemExamine = slot.getItem();
 
-				if (null != slotToItemExamine && !slotToItemExamine.isDamageAndIDIdentical(leftClickPersistentStack)) {
+				/** - Do nothing if slot item does not match held item */
+				if (null != slotToItemExamine && !slotToItemExamine.isDamageAndIDIdentical(leftClickPersistentStack)){
 					return;
 				}
 
+				/** - Do nothing if there are no more items to distribute */
 				if (1.0 == (double)leftClickItemAmount / (double)leftClickHoveredSlots.size()) {
 					return;
 				}
@@ -288,16 +290,20 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		{
 			/** - Do nothing if slot has already been added to Right-click + Drag logic */
 			if (!rightClickHoveredSlots.contains(slot)) {
+				/** - Do nothing if slot item does not match held item */
 				if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(rightClickPersistentStack)) {
 					return;
 				}
 
+				/** - Do nothing if there are no more items to distribute */
 				if (1.0 == (double)rightClickItemAmount / (double)rightClickHoveredSlots.size()) {
 					return;
 				}
 
+				/** - Add slot to item distribution */
 				rightClickHoveredSlots.add(slot);
 
+				/** - Distribute one item to the slot (first slot happens instantly in mouseClicked function) */
 				if (rightClickHoveredSlots.size() > 1) {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
 				}
