@@ -61,10 +61,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Unique final List<Integer> rightClickExistingAmount = new ArrayList<>();
 
-	@Unique List<Integer> leftClickAmountToFill = new ArrayList<>();
-
-	@Unique List<Integer> rightClickAmountToFill = new ArrayList<>();
-
 	@Unique List<Integer> leftClickAmountToFillPersistent = new ArrayList<>();
 
 	@Unique List<Integer> rightClickAmountToFillPersistent = new ArrayList<>();
@@ -77,10 +73,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			if (isLeftClickDragStarted) {
 				if (leftClickHoveredSlots.size() > 1) {
 					super.mouseClicked(mouseX, mouseY, button);
-					
+
 					minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
-						leftClickAmountToFill.add(leftClickAmountToFillPersistent.get(leftClickHoveredSlotsIndex));
 						if (0 != leftClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
 							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(leftClickPersistentStack.itemId, leftClickExistingAmount.get(leftClickHoveredSlotsIndex), leftClickPersistentStack.getDamage()));
 						} else {
@@ -89,7 +84,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 
 					/** - New */ leftClickExistingAmount.clear();
-					/** - New */ leftClickAmountToFill.clear();
 					/** - New */ leftClickAmountToFillPersistent.clear();
 					leftClickPersistentStack = null;
 					leftClickHoveredSlots.clear();
@@ -195,6 +189,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					leftClickHoveredSlots.add(slot);
 					ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 					ItemInstance slotToExamine = slot.getItem();
+					List<Integer> leftClickAmountToFill = new ArrayList<>();
 
 					if (null != slotToExamine) {
 						leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotToExamine.count);
@@ -219,17 +214,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
 						}
 					}
-////						cursorStack = minecraft.player.inventory.getCursorItem();
-////						if (leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).hasItem() && leftClickHoveredSlots.size() > 1)
-////						{
-////							if (leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).getItem().count != leftClickDragItemType.getMaxStackSize()) {
-////								if (null != cursorStack) {
-////									this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
-////								}
-////
-////								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
-////							}
-////						}
 
 					int numberOfSlotsRemainingToFill = leftClickHoveredSlots.size();
 					int itemsPerSlot = leftClickRemainingItemAmount / numberOfSlotsRemainingToFill;
@@ -274,7 +258,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				}
 			} else {
 				/** - New */ leftClickExistingAmount.clear();
-				/** - New */ leftClickAmountToFill.clear();
 				/** - New */ leftClickAmountToFillPersistent.clear();
 				leftClickHoveredSlots.clear();
 				leftClickItemAmount = 0;
@@ -282,7 +265,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			}
 		} else {
 			/** - New */ leftClickExistingAmount.clear();
-			/** - New */ leftClickAmountToFill.clear();
 			/** - New */ leftClickAmountToFillPersistent.clear();
 			leftClickPersistentStack = null;
 			leftClickHoveredSlots.clear();
