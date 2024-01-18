@@ -94,8 +94,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			/** - Cancel Left-click + Drag */
 			if (isLeftClickDragStarted) {
 				if (leftClickHoveredSlots.size() > 1) {
+					/** - Handle if a button was clicked */
 					super.mouseClicked(mouseX, mouseY, button);
 
+					/** - Return all slots to normal */
 					minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
 						if (0 != leftClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
@@ -105,23 +107,29 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					}
 
+					/** - Reset Left-click + Drag variables and exit function */
 					inventoryTweaks_resetLeftClickDragVariables();
 					ci.cancel();
 					return;
 				}
 			}
 
+			/** - Handle Right-click if an item is held */
 			if (cursorStack != null) {
+				/** - Ensure a slot was clicked */
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (clickedSlot != null) {
+					/** - Handle if a button was clicked */
 					super.mouseClicked(mouseX, mouseY, button);
 
+					/** - Begin Right-click + Drag */
 					if (cursorStack != null && rightClickPersistentStack == null && isRightClickDragStarted == false) {
 						rightClickPersistentStack = cursorStack;
 						rightClickItemAmount = rightClickPersistentStack.count;
 						isRightClickDragStarted = true;
 					}
 
+					/** - Handle initial Right-click */
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 1, false, this.minecraft.player);
 					ci.cancel();
 					return;
@@ -137,8 +145,11 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			/** - Cancel Right-click + Drag */
 			if (isRightClickDragStarted) {
 				if (rightClickHoveredSlots.size() > 1) {
+					/** - Handle if a button was clicked */
 					super.mouseClicked(mouseX, mouseY, button);
 
+					/** - Return all slots to normal */
+					// Logic is currently broken here. Slot items are collected, when instead they need to be returned to normal
 					for (int distributeSlotsIndex = 0; distributeSlotsIndex < rightClickHoveredSlots.size(); distributeSlotsIndex++) {
 						cursorStack = minecraft.player.inventory.getCursorItem();
 						if (rightClickHoveredSlots.get(distributeSlotsIndex).hasItem()) {
@@ -150,24 +161,30 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					}
 
+					/** - Reset Right-click + Drag variables and exit function */
 					inventoryTweaks_resetRightClickDragVariables();
 					ci.cancel();
 					return;
 				}
 			}
 
+			/** - Handle Left-click if an item is held */
 			if (cursorStack != null) {
+				/** - Ensure a slot was clicked */
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (clickedSlot != null) {
 					//if (!clickedSlot.hasItem()) {
+					/** - Handle if a button was clicked */
 						super.mouseClicked(mouseX, mouseY, button);
 
+					/** - Begin Left-click + Drag */
 						if (cursorStack != null && leftClickPersistentStack == null && isLeftClickDragStarted == false) {
 							leftClickPersistentStack = cursorStack;
 							leftClickItemAmount = leftClickPersistentStack.count;
 							isLeftClickDragStarted = true;
 						}
 
+					/** - Handle initial Left-click */
 						//this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
 						ci.cancel();
 						return;
