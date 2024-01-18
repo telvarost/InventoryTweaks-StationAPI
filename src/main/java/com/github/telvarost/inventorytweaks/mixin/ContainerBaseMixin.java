@@ -65,6 +65,24 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Unique List<Integer> rightClickAmountToFillPersistent = new ArrayList<>();
 
+	@Unique private void inventoryTweaks_resetLeftClickDragVariables()
+	{
+		leftClickExistingAmount.clear();
+		leftClickAmountToFillPersistent.clear();
+		leftClickPersistentStack = null;
+		leftClickHoveredSlots.clear();
+		leftClickItemAmount = 0;
+		isLeftClickDragStarted = false;
+	}
+	
+	@Unique private void inventoryTweaks_resetRightClickDragVariables()
+	{
+		rightClickPersistentStack = null;
+		rightClickHoveredSlots.clear();
+		rightClickItemAmount = 0;
+		isRightClickDragStarted = false;
+	}
+
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		if (button == 1) {
@@ -83,11 +101,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					}
 
-					/** - New */ leftClickExistingAmount.clear();
-					/** - New */ leftClickAmountToFillPersistent.clear();
-					leftClickPersistentStack = null;
-					leftClickHoveredSlots.clear();
-					isLeftClickDragStarted = false;
+					inventoryTweaks_resetLeftClickDragVariables();
 					ci.cancel();
 					return;
 				}
@@ -129,9 +143,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					}
 
-					rightClickHoveredSlots.clear();
-					rightClickItemAmount = 0;
-					isRightClickDragStarted = false;
+					inventoryTweaks_resetRightClickDragVariables();
 					ci.cancel();
 					return;
 				}
@@ -171,15 +183,18 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private void inventoryTweaks_mouseReleasedOrSlotChanged(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		slot = this.getSlot(mouseX, mouseY);
 
+		/** - Do nothing if mouse is not over a slot */
 		if (slot == null)
 			return;
 
+		/** - Left-click + Drag logic = evenly distribute held items over slots */
 		if (button == -1 && Mouse.isButtonDown(0) && isRightClickDragStarted == false) {
-
+			/** - Ensure held stack is not null */
 			if (leftClickPersistentStack != null) {
+				/** - Do nothing if slot has already been added to Left-click + Drag logic */
 				if (!leftClickHoveredSlots.contains(slot)) {
 					ItemInstance slotToItemExamine = slot.getItem();
-					
+
 					if (null != slotToItemExamine && !slotToItemExamine.isDamageAndIDIdentical(leftClickPersistentStack)) {
 						return;
 					}
@@ -258,24 +273,17 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 				}
 			} else {
-				/** - New */ leftClickExistingAmount.clear();
-				/** - New */ leftClickAmountToFillPersistent.clear();
-				leftClickHoveredSlots.clear();
-				leftClickItemAmount = 0;
-				isLeftClickDragStarted = false;
+				inventoryTweaks_resetLeftClickDragVariables();
 			}
 		} else {
-			/** - New */ leftClickExistingAmount.clear();
-			/** - New */ leftClickAmountToFillPersistent.clear();
-			leftClickPersistentStack = null;
-			leftClickHoveredSlots.clear();
-			leftClickItemAmount = 0;
-			isLeftClickDragStarted = false;
+			inventoryTweaks_resetLeftClickDragVariables();
 		}
 
+		/** - Right-click + Drag logic = distribute one item from held items to each slot */
 		if (button == -1 && Mouse.isButtonDown(1) && isLeftClickDragStarted == false)  {
-
+			/** - Ensure held stack is not null */
 			if (rightClickPersistentStack != null) {
+				/** - Do nothing if slot has already been added to Right-click + Drag logic */
 				if (!rightClickHoveredSlots.contains(slot)) {
 					if (slot.hasItem() && !slot.getItem().isDamageAndIDIdentical(rightClickPersistentStack)) {
 						return;
@@ -292,15 +300,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 				}
 			} else {
-				rightClickHoveredSlots.clear();
-				rightClickItemAmount = 0;
-				isRightClickDragStarted = false;
+				inventoryTweaks_resetRightClickDragVariables();
 			}
 		} else {
-			rightClickPersistentStack = null;
-			rightClickHoveredSlots.clear();
-			rightClickItemAmount = 0;
-			isRightClickDragStarted = false;
+			inventoryTweaks_resetRightClickDragVariables();
 		}
 	}
 
