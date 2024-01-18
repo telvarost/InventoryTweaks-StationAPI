@@ -22,7 +22,6 @@
     "stationapi:event_bus": [
     ],
     "stationapi:event_bus_client": [
-      "com.github.telvarost.inventorytweaks.events.init.ClientInitListener"
     ],
     "stationapi:event_bus_server": [
     ],
