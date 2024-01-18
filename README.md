@@ -4,8 +4,6 @@ A StationAPI mod for Minecraft Beta 1.7.3 that adds some inventory tweaks.
 
 # Inventory Tweaks
 
-**There's a very high chance this mod will not work in multiplayer, as of right now it is purely for singleplayer**
-
 ## List of Changes:
 
 Adds `LeftClick + Drag` mechanic to evenly distribute held items over empty slots/slots with the same item as in modern Minecraft.
