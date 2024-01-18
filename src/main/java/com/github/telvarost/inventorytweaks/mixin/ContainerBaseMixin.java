@@ -123,6 +123,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					/** - Handle if a button was clicked */
 					super.mouseClicked(mouseX, mouseY, button);
 
+					/** - Record how many items are in the slot */
+					if (null != clickedSlot.getItem()) {
+						rightClickExistingAmount.add(clickedSlot.getItem().count);
+					}
+					else
+					{
+						rightClickExistingAmount.add(0);
+					}
+
 					/** - Begin Right-click + Drag */
 					if (cursorStack != null && rightClickPersistentStack == null && isRightClickDragStarted == false) {
 						rightClickPersistentStack = cursorStack;
@@ -171,31 +180,31 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				/** - Ensure a slot was clicked */
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (clickedSlot != null) {
-					//if (!clickedSlot.hasItem()) {
 					/** - Handle if a button was clicked */
 						super.mouseClicked(mouseX, mouseY, button);
 
+					/** - Record how many items are in the slot and how many items are needed to fill the slot */
+					if (null != clickedSlot.getItem()) {
+						leftClickAmountToFillPersistent.add(cursorStack.getMaxStackSize() - clickedSlot.getItem().count);
+						leftClickExistingAmount.add(clickedSlot.getItem().count);
+					}
+					else
+					{
+						leftClickAmountToFillPersistent.add(cursorStack.getMaxStackSize());
+						leftClickExistingAmount.add(0);
+					}
+
 					/** - Begin Left-click + Drag */
-						if (cursorStack != null && leftClickPersistentStack == null && isLeftClickDragStarted == false) {
-							leftClickPersistentStack = cursorStack;
-							leftClickItemAmount = leftClickPersistentStack.count;
-							isLeftClickDragStarted = true;
-						}
+					if (cursorStack != null && leftClickPersistentStack == null && isLeftClickDragStarted == false) {
+						leftClickPersistentStack = cursorStack;
+						leftClickItemAmount = leftClickPersistentStack.count;
+						isLeftClickDragStarted = true;
+					}
 
 					/** - Handle initial Left-click */
-						//this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
-						ci.cancel();
-						return;
-					//}
-//					else
-//					{
-//						ItemInstance firstRightClickSlotItem = clickedSlot.getItem();
-//
-//						leftClickSlotItems.add(firstRightClickSlotItem);
-//
-//						firstRightClickSlotItem.getMaxStackSize();
-//						firstRightClickSlotItem.count
-//					}
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
+					ci.cancel();
+					return;
 				}
 			}
 		}
@@ -233,17 +242,18 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				/** - Add slot to item distribution */
 				rightClickHoveredSlots.add(slot);
 
-				/** - Record how many items are in the slot */
-				if (null != slotItemToExamine) {
-					rightClickExistingAmount.add(slotItemToExamine.count);
-				}
-				else
-				{
-					rightClickExistingAmount.add(0);
-				}
-
-				/** - Distribute one item to the slot (first slot happens instantly in mouseClicked function) */
+				/** - First slot is handled instantly in mouseClicked function */
 				if (rightClickHoveredSlots.size() > 1) {
+					/** - Record how many items are in the slot */
+					if (null != slotItemToExamine) {
+						rightClickExistingAmount.add(slotItemToExamine.count);
+					}
+					else
+					{
+						rightClickExistingAmount.add(0);
+					}
+
+					/** - Distribute one item to the slot */
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
 				}
 			}
@@ -275,62 +285,63 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				/** - Add slot to item distribution */
 				leftClickHoveredSlots.add(slot);
 
-				/** - Record how many items are in the slot and how many items are needed to fill the slot */
-				if (null != slotItemToExamine) {
-					leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotItemToExamine.count);
-					leftClickExistingAmount.add(slotItemToExamine.count);
-				}
-				else
-				{
-					leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize());
-					leftClickExistingAmount.add(0);
-				}
-
-				/** - Return all slots to normal */
-				List<Integer> leftClickAmountToFill = new ArrayList<>();
-				minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
-				for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
-					leftClickAmountToFill.add(leftClickAmountToFillPersistent.get(leftClickHoveredSlotsIndex));
-					if (0 != leftClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
-						leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(leftClickPersistentStack.itemId, leftClickExistingAmount.get(leftClickHoveredSlotsIndex), leftClickPersistentStack.getDamage()));
-					} else {
-						leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
+				/** - First slot is handled instantly in mouseClicked function */
+				if (leftClickHoveredSlots.size() > 1) {
+					/** - Record how many items are in the slot and how many items are needed to fill the slot */
+					if (null != slotItemToExamine) {
+						leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotItemToExamine.count);
+						leftClickExistingAmount.add(slotItemToExamine.count);
 					}
-				}
+					else
+					{
+						leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize());
+						leftClickExistingAmount.add(0);
+					}
 
-				/** - Prepare to distribute over slots */
-				int numberOfSlotsRemainingToFill = leftClickHoveredSlots.size();
-				int itemsPerSlot = leftClickItemAmount / numberOfSlotsRemainingToFill;
-				int leftClickRemainingItemAmount = leftClickItemAmount;
-				boolean rerunLoop;
+					/** - Return all slots to normal */
+					List<Integer> leftClickAmountToFill = new ArrayList<>();
+					minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
+					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
+						leftClickAmountToFill.add(leftClickAmountToFillPersistent.get(leftClickHoveredSlotsIndex));
+						if (0 != leftClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
+							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(leftClickPersistentStack.itemId, leftClickExistingAmount.get(leftClickHoveredSlotsIndex), leftClickPersistentStack.getDamage()));
+						} else {
+							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
+						}
+					}
 
-				/** - Distribute fewer items to slots whose max stack size will be filled */
-				do {
-					rerunLoop = false;
-					if (0 != numberOfSlotsRemainingToFill) {
-						itemsPerSlot = leftClickRemainingItemAmount / numberOfSlotsRemainingToFill;
+					/** - Prepare to distribute over slots */
+					int numberOfSlotsRemainingToFill = leftClickHoveredSlots.size();
+					int itemsPerSlot = leftClickItemAmount / numberOfSlotsRemainingToFill;
+					int leftClickRemainingItemAmount = leftClickItemAmount;
+					boolean rerunLoop;
 
-						if (0 != itemsPerSlot)
-						{
-							for (int slotsToCheckIndex = 0; slotsToCheckIndex < leftClickAmountToFill.size(); slotsToCheckIndex++) {
-								if (0 != leftClickAmountToFill.get(slotsToCheckIndex) && leftClickAmountToFill.get(slotsToCheckIndex) < itemsPerSlot) {
-									/** - Just fill the slot and return */
-									for (int fillTheAmountIndex = 0; fillTheAmountIndex < leftClickAmountToFill.get(slotsToCheckIndex); fillTheAmountIndex++) {
-										this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(slotsToCheckIndex).id, 1, false, this.minecraft.player);
+					/** - Distribute fewer items to slots whose max stack size will be filled */
+					do {
+						rerunLoop = false;
+						if (0 != numberOfSlotsRemainingToFill) {
+							itemsPerSlot = leftClickRemainingItemAmount / numberOfSlotsRemainingToFill;
+
+							if (0 != itemsPerSlot)
+							{
+								for (int slotsToCheckIndex = 0; slotsToCheckIndex < leftClickAmountToFill.size(); slotsToCheckIndex++) {
+									if (0 != leftClickAmountToFill.get(slotsToCheckIndex) && leftClickAmountToFill.get(slotsToCheckIndex) < itemsPerSlot) {
+										/** - Just fill the slot and return */
+										for (int fillTheAmountIndex = 0; fillTheAmountIndex < leftClickAmountToFill.get(slotsToCheckIndex); fillTheAmountIndex++) {
+											this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(slotsToCheckIndex).id, 1, false, this.minecraft.player);
+										}
+
+										leftClickRemainingItemAmount = leftClickRemainingItemAmount - leftClickAmountToFill.get(slotsToCheckIndex);
+										leftClickAmountToFill.set(slotsToCheckIndex, 0);
+										numberOfSlotsRemainingToFill--;
+										rerunLoop = true;
 									}
-
-									leftClickRemainingItemAmount = leftClickRemainingItemAmount - leftClickAmountToFill.get(slotsToCheckIndex);
-									leftClickAmountToFill.set(slotsToCheckIndex, 0);
-									numberOfSlotsRemainingToFill--;
-									rerunLoop = true;
 								}
 							}
 						}
-					}
-				} while (rerunLoop && 0 != numberOfSlotsRemainingToFill);
+					} while (rerunLoop && 0 != numberOfSlotsRemainingToFill);
 
-				/** - Distribute remaining items evenly over remaining slots that were not already filled to max stack size */
-				if (leftClickHoveredSlots.size() > 0) {
+					/** - Distribute remaining items evenly over remaining slots that were not already filled to max stack size */
 					for (int distributeSlotsIndex = 0; distributeSlotsIndex < leftClickHoveredSlots.size(); distributeSlotsIndex++) {
 						if (0 != leftClickAmountToFill.get(distributeSlotsIndex)) {
 							for (int addSlotIndex = 0; addSlotIndex < itemsPerSlot; addSlotIndex++) {
