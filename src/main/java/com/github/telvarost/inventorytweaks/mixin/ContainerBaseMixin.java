@@ -218,10 +218,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		{
 			/** - Do nothing if slot has already been added to Right-click + Drag logic */
 			if (!rightClickHoveredSlots.contains(slot)) {
-				ItemInstance slotToItemExamine = slot.getItem();
+				ItemInstance slotItemToExamine = slot.getItem();
 
 				/** - Do nothing if slot item does not match held item */
-				if (null != slotToItemExamine && !slotToItemExamine.isDamageAndIDIdentical(rightClickPersistentStack)) {
+				if (null != slotItemToExamine && !slotItemToExamine.isDamageAndIDIdentical(rightClickPersistentStack)) {
 					return;
 				}
 
@@ -234,8 +234,8 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				rightClickHoveredSlots.add(slot);
 
 				/** - Record how many items are in the slot */
-				if (null != slotToItemExamine) {
-					rightClickExistingAmount.add(slotToItemExamine.count);
+				if (null != slotItemToExamine) {
+					rightClickExistingAmount.add(slotItemToExamine.count);
 				}
 				else
 				{
@@ -260,10 +260,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		{
 			/** - Do nothing if slot has already been added to Left-click + Drag logic */
 			if (!leftClickHoveredSlots.contains(slot)) {
-				ItemInstance slotToItemExamine = slot.getItem();
+				ItemInstance slotItemToExamine = slot.getItem();
 
 				/** - Do nothing if slot item does not match held item */
-				if (null != slotToItemExamine && !slotToItemExamine.isDamageAndIDIdentical(leftClickPersistentStack)){
+				if (null != slotItemToExamine && !slotItemToExamine.isDamageAndIDIdentical(leftClickPersistentStack)){
 					return;
 				}
 
@@ -276,9 +276,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				leftClickHoveredSlots.add(slot);
 
 				/** - Record how many items are in the slot and how many items are needed to fill the slot */
-				if (null != slotToItemExamine) {
-					leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotToItemExamine.count);
-					leftClickExistingAmount.add(slotToItemExamine.count);
+				if (null != slotItemToExamine) {
+					leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotItemToExamine.count);
+					leftClickExistingAmount.add(slotItemToExamine.count);
 				}
 				else
 				{
