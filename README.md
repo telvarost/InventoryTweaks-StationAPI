@@ -4,11 +4,16 @@ A StationAPI mod for Minecraft Beta 1.7.3 that adds some inventory tweaks.
 
 # Inventory Tweaks
 
+This mod is currently incompatible with the regular version of MojangFix. If you would like to use that mod you will need the compatibility version of the mod for InventoryTweaks found here: [https://github.com/telvarost/MojangFix-StationAPI/releases](https://github.com/telvarost/MojangFix-StationAPI/releases)
+
 **There's a very high chance this mod will not work in multiplayer, as of right now it is purely for singleplayer**
 
 ## List of Changes:
 
-Adds `LeftClick + Drag` mechanic to evenly distribute held items over empty slots/slots with the same item as in modern Minecraft.
+* Adds `Left-Click + Drag` mechanic to evenly distribute held items over empty slots/slots with the same item as in modern Minecraft.
+* Adds `Right-Click + Drag` mechanic to distribute one item from held items over empty slots/slots with the same item as in modern Minecraft.
+* `LCtrl + DROP_KEY` to drop a whole stack of items.
+* Move items from player inventory to the hotbar by pressing the number key corresponding to the desired hotbar slot while hovering the cursor over the item to move.
 
 ## Installation using Prism Launcher
 
