@@ -89,7 +89,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			if (!inventoryTweaks_cancelLeftClickDrag()) {
 
 				/** - Handle Right-click */
-				exitFunction = inventoryTweaks_handleRightClick(mouseX, mouseY);
+				if (Config.ModernMinecraftConfig.EnableRightClickDrag) {
+					exitFunction = inventoryTweaks_handleRightClick(mouseX, mouseY);
+				}
 			} else {
 				exitFunction = true;
 			}
@@ -113,7 +115,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (cursorStack != null) {
-					exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot);
+					if (Config.ModernMinecraftConfig.EnableLeftClickDrag) {
+						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot);
+					}
 				} else {
 					exitFunction = inventoryTweaks_handleLeftClickWithoutItem(clickedSlot);
 				}
@@ -150,9 +154,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 			/** - Do nothing if slot item does not match held item or if the slot is full */
 			if (  (null != slotItemToExamine)
-					&& (  (!slotItemToExamine.isDamageAndIDIdentical(rightClickPersistentStack))
-					|| (slotItemToExamine.count == rightClickPersistentStack.getMaxStackSize())
-			)
+			   && (  (!slotItemToExamine.isDamageAndIDIdentical(rightClickPersistentStack))
+				  || (slotItemToExamine.count == rightClickPersistentStack.getMaxStackSize())
+			      )
 			) {
 				return;
 			}
@@ -610,8 +614,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 		if (Config.ModernMinecraftConfig.NumKeyHotbarSwap) {
 			if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9) {
-				if (this.minecraft.player.inventory.getCursorItem() == null)
+				if (this.minecraft.player.inventory.getCursorItem() == null) {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
+				}
 				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, 35 + keyCode - 1, 0, false, this.minecraft.player);
 				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
 			}

@@ -21,6 +21,12 @@ public class Config {
 
     public static class ModernMinecraftConfig {
 
+        @ConfigName("Enable [Left-Click + Drag]")
+        public static Boolean EnableLeftClickDrag = true;
+
+        @ConfigName("Enable [Right-Click + Drag]")
+        public static Boolean EnableRightClickDrag = true;
+
         @ConfigName("Prefer [Shift-Click] over [Left-Click + Drag]")
         public static Boolean LMBPreferShiftClick = true;
 
