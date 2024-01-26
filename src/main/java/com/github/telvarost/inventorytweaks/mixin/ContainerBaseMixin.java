@@ -36,6 +36,14 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	@Unique
 	private Slot slot;
 
+	@Unique Slot lastRMBSlot = null;
+
+	@Unique Slot lastLMBSlot = null;
+
+	@Unique int lastRMBSlotId = -1;
+
+	@Unique int lastLMBSlotId = -1;
+
 	@Unique
 	private ItemInstance leftClickPersistentStack;
 
@@ -140,6 +148,8 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 
 					/** - Handle initial Right-click */
+					lastRMBSlotId = clickedSlot.id;
+					lastRMBSlot = clickedSlot;
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 1, false, this.minecraft.player);
 					ci.cancel();
 					return;
@@ -202,6 +212,8 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 
 					/** - Handle initial Left-click */
+					lastLMBSlotId = clickedSlot.id;
+					lastLMBSlot = clickedSlot;
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, false, this.minecraft.player);
 					ci.cancel();
 					return;
@@ -239,11 +251,17 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					return;
 				}
 
-				/** - Add slot to item distribution */
-				rightClickHoveredSlots.add(slot);
-
 				/** - First slot is handled instantly in mouseClicked function */
-				if (rightClickHoveredSlots.size() > 1) {
+				if (slot.id != lastRMBSlotId) {
+					if (0 == rightClickHoveredSlots.size())
+					{
+						/** - Add slot to item distribution */
+						rightClickHoveredSlots.add(lastRMBSlot);
+					}
+
+					/** - Add slot to item distribution */
+					rightClickHoveredSlots.add(slot);
+
 					/** - Record how many items are in the slot */
 					if (null != slotItemToExamine) {
 						rightClickExistingAmount.add(slotItemToExamine.count);
@@ -282,11 +300,17 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					return;
 				}
 
-				/** - Add slot to item distribution */
-				leftClickHoveredSlots.add(slot);
-
 				/** - First slot is handled instantly in mouseClicked function */
-				if (leftClickHoveredSlots.size() > 1) {
+				if (slot.id != lastLMBSlotId) {
+					if (0 == leftClickHoveredSlots.size())
+					{
+						/** - Add slot to item distribution */
+						leftClickHoveredSlots.add(lastLMBSlot);
+					}
+
+					/** - Add slot to item distribution */
+					leftClickHoveredSlots.add(slot);
+
 					/** - Record how many items are in the slot and how many items are needed to fill the slot */
 					if (null != slotItemToExamine) {
 						leftClickAmountToFillPersistent.add(leftClickPersistentStack.getMaxStackSize() - slotItemToExamine.count);
