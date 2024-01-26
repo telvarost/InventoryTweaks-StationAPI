@@ -165,7 +165,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 			if (!rightClickHoveredSlots.contains(slot)) {
 				inventoryTweaks_handleRightClickDrag(slotItemToExamine);
-			} else if (Config.ConfigFields.RMBTweak) {
+			} else if (Config.MouseTweaksConfig.RMBTweak) {
 				inventoryTweaks_handleRightClickDragMouseTweaks();
 			}
 		} else {
@@ -220,7 +220,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				/** - Handle initial Right-click */
 				lastRMBSlotId = clickedSlot.id;
 				lastRMBSlot = clickedSlot;
-				if (Config.ConfigFields.RMBPreferShiftClick) {
+				if (Config.ModernMinecraftConfig.RMBPreferShiftClick) {
 					boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 1, isShiftKeyDown, this.minecraft.player);
 
@@ -334,7 +334,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			/** - Handle initial Left-click */
 			lastLMBSlotId = clickedSlot.id;
 			lastLMBSlot = clickedSlot;
-			if (Config.ConfigFields.LMBPreferShiftClick) {
+			if (Config.ModernMinecraftConfig.LMBPreferShiftClick) {
 				boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
 
@@ -389,12 +389,12 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					if (slotItemToExamine.isDamageAndIDIdentical(leftClickMouseTweaksPersistentStack))
 					{
 						if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-							if (Config.ConfigFields.LMBTweakWithItem)
+							if (Config.MouseTweaksConfig.LMBTweakShiftClick)
 							{
 								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, true, this.minecraft.player);
 							}
 						} else {
-							if (Config.ConfigFields.LMBTweakWithItem) {
+							if (Config.MouseTweaksConfig.LMBTweakPickUp) {
 								ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
 								if (cursorStack == null) {
@@ -425,7 +425,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							}
 						}
 					}
-				} else if (  (Config.ConfigFields.LMBTweakWithoutItem)
+				} else if (  (Config.MouseTweaksConfig.LMBTweakShiftClickAny)
 						&& (  (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
 						|| (Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
 				)
@@ -574,9 +574,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;isMouseOverSlot(Lnet/minecraft/container/slot/Slot;II)Z"))
 	private boolean inventoryTweaks_isMouseOverSlot(ContainerBase guiContainer, Slot slot, int x, int y) {
 		return (  (drawingHoveredSlot = rightClickHoveredSlots.contains(slot))
-				|| (drawingHoveredSlot = leftClickHoveredSlots.contains(slot))
-				|| isMouseOverSlot(slot, x, y)
-		);
+			   || (drawingHoveredSlot = leftClickHoveredSlots.contains(slot))
+			   || isMouseOverSlot(slot, x, y)
+			   );
 	}
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;fillGradient(IIIIII)V", ordinal = 0))
@@ -588,23 +588,33 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Inject(method = "keyPressed", at = @At("RETURN"))
 	private void inventoryTweaks_keyPressed(char character, int keyCode, CallbackInfo ci) {
-		if (this.slot == null)
+		if (this.slot == null) {
 			return;
-
-		if (keyCode == this.minecraft.options.dropKey.key) {
-			if (this.minecraft.player.inventory.getCursorItem() != null)
-				return;
-
-			this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
-			this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, -999, Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) ? 0 : 1, false, this.minecraft.player);
-			this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
 		}
 
-		if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9) {
-			if (this.minecraft.player.inventory.getCursorItem() == null)
+		if (Config.ModernMinecraftConfig.UseDropKeyInInventory) {
+			if (keyCode == this.minecraft.options.dropKey.key) {
+				if (this.minecraft.player.inventory.getCursorItem() != null) {
+					return;
+				}
+
 				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
-			this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, 35 + keyCode - 1, 0, false, this.minecraft.player);
-			this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
+				if (Config.ModernMinecraftConfig.LCtrlStackDrop) {
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, -999, Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) ? 0 : 1, false, this.minecraft.player);
+				} else {
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, -999, 1, false, this.minecraft.player);
+				}
+				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
+			}
+		}
+
+		if (Config.ModernMinecraftConfig.NumKeyHotbarSwap) {
+			if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9) {
+				if (this.minecraft.player.inventory.getCursorItem() == null)
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, 35 + keyCode - 1, 0, false, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
+			}
 		}
 	}
 }

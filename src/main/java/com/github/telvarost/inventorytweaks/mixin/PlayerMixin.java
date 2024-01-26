@@ -1,5 +1,6 @@
 package com.github.telvarost.inventorytweaks.mixin;
 
+import com.github.telvarost.inventorytweaks.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.ClientPlayer;
 import net.minecraft.entity.player.PlayerBase;
@@ -13,6 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerMixin {
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
     private void inventoryTweaks_dropSelectedItem(CallbackInfo ci) {
+        if (!Config.ModernMinecraftConfig.LCtrlStackDrop) {
+            return;
+        }
+
         if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
             Minecraft minecraft = MinecraftAccessor.getInstance();
             PlayerBase playerBase = (PlayerBase) (Object) this;
