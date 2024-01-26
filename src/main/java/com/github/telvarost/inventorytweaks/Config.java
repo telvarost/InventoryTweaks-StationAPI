@@ -21,6 +21,9 @@ public class Config {
 
     public static class ModernMinecraftConfig {
 
+        @ConfigName("Enable [Click + Drag] graphics")
+        public static Boolean EnableDragGraphics = true;
+
         @ConfigName("Enable [Left-Click + Drag]")
         public static Boolean EnableLeftClickDrag = true;
 

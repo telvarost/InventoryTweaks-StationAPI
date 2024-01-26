@@ -577,17 +577,25 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;isMouseOverSlot(Lnet/minecraft/container/slot/Slot;II)Z"))
 	private boolean inventoryTweaks_isMouseOverSlot(ContainerBase guiContainer, Slot slot, int x, int y) {
-		return (  (drawingHoveredSlot = rightClickHoveredSlots.contains(slot))
-			   || (drawingHoveredSlot = leftClickHoveredSlots.contains(slot))
-			   || isMouseOverSlot(slot, x, y)
-			   );
+		if (Config.ModernMinecraftConfig.EnableDragGraphics) {
+			return (  (drawingHoveredSlot = rightClickHoveredSlots.contains(slot))
+				   || (drawingHoveredSlot = leftClickHoveredSlots.contains(slot))
+				   || isMouseOverSlot(slot, x, y)
+				   );
+		} else {
+			return isMouseOverSlot(slot, x, y);
+		}
 	}
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;fillGradient(IIIIII)V", ordinal = 0))
 	private void inventoryTweaks_fillGradient(ContainerBase instance, int startX, int startY, int endX, int endY, int colorStart, int colorEnd) {
-		if (colorStart != colorEnd) throw new AssertionError();
-		int color = drawingHoveredSlot ? 0x20ffffff : colorStart;
-		this.fillGradient(startX, startY, endX, endY, color, color);
+		if (Config.ModernMinecraftConfig.EnableDragGraphics) {
+			if (colorStart != colorEnd) throw new AssertionError();
+			int color = drawingHoveredSlot ? 0x20ffffff : colorStart;
+			this.fillGradient(startX, startY, endX, endY, color, color);
+		} else {
+			this.fillGradient(startX, startY, endX, endY, colorStart, colorEnd);
+		}
 	}
 
 	@Inject(method = "keyPressed", at = @At("RETURN"))
