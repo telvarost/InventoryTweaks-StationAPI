@@ -50,6 +50,17 @@ public class Config {
 
     public static class MouseTweaksConfig {
 
+        /** @todo - All of the comments below */
+        // Turn this into a category with submenus and implement the following
+        // - Invert scroll wheel direction -> default false
+        // - Position aware scrolling (inventory scroll action) -> default false
+        //   - Slot position will determine scroll direction
+        // - Transfer between cursor and slot
+        //   - Hit shift to transfer between inventories
+        // - Transfer between inventories without shift
+        //   - If true disable transfer between cursor and slot
+        // - WheelSearchOrder true equals first to last
+        //   - Make false for last to first
         @ConfigName("Cursor/Slot [ScrollWheel] transfer")
         public static Boolean ScrollWheelTransfer = true;
 
