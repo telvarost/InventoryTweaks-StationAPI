@@ -78,7 +78,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	@Unique List<Integer> leftClickAmountToFillPersistent = new ArrayList<>();
 
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-	protected void mouseTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
+	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		isLeftClickDragMouseTweaksStarted = false;
 
 		/** - Right-click */
@@ -86,10 +86,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			boolean exitFunction = false;
 
 			/** - Should click cancel Left-click + Drag */
-			if (!mouseTweaks_cancelLeftClickDrag()) {
+			if (!inventoryTweaks_cancelLeftClickDrag()) {
 
 				/** - Handle Right-click */
-				exitFunction = mouseTweaks_handleRightClick(mouseX, mouseY);
+				exitFunction = inventoryTweaks_handleRightClick(mouseX, mouseY);
 			} else {
 				exitFunction = true;
 			}
@@ -107,15 +107,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			boolean exitFunction = false;
 
 			/** - Should click cancel Right-click + Drag */
-			if (!mouseTweaks_cancelRightClickDrag()) {
+			if (!inventoryTweaks_cancelRightClickDrag()) {
 
 				/** - Handle Left-click */
 				ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (cursorStack != null) {
-					exitFunction = mouseTweaks_handleLeftClickWithItem(cursorStack, clickedSlot);
+					exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot);
 				} else {
-					exitFunction = mouseTweaks_handleLeftClickWithoutItem(clickedSlot);
+					exitFunction = inventoryTweaks_handleLeftClickWithoutItem(clickedSlot);
 				}
 			} else {
 				exitFunction = true;
@@ -131,7 +131,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	}
 
 	@Inject(method = "mouseReleased", at = @At("RETURN"), cancellable = true)
-	private void mouseTweaks_mouseReleasedOrSlotChanged(int mouseX, int mouseY, int button, CallbackInfo ci) {
+	private void inventoryTweaks_mouseReleasedOrSlotChanged(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		slot = this.getSlot(mouseX, mouseY);
 
 		/** - Do nothing if mouse is not over a slot */
@@ -164,12 +164,12 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			}
 
 			if (!rightClickHoveredSlots.contains(slot)) {
-				mouseTweaks_handleRightClickDrag(slotItemToExamine);
+				inventoryTweaks_handleRightClickDrag(slotItemToExamine);
 			} else if (Config.ConfigFields.RMBTweak) {
-				mouseTweaks_handleRightClickDragMouseTweaks();
+				inventoryTweaks_handleRightClickDragMouseTweaks();
 			}
 		} else {
-			mouseTweaks_resetRightClickDragVariables();
+			inventoryTweaks_resetRightClickDragVariables();
 		}
 
 		/** - Left-click + Drag logic = evenly distribute held items over slots */
@@ -179,20 +179,20 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		)
 		{
 			if (isLeftClickDragMouseTweaksStarted) {
-				mouseTweaks_handleLeftClickDragMouseTweaks();
+				inventoryTweaks_handleLeftClickDragMouseTweaks();
 			} else if ( leftClickPersistentStack != null ) {
-				if (mouseTweaks_handleLeftClickDrag()) {
+				if (inventoryTweaks_handleLeftClickDrag()) {
 					return;
 				}
 			} else {
-				mouseTweaks_resetLeftClickDragVariables();
+				inventoryTweaks_resetLeftClickDragVariables();
 			}
 		} else {
-			mouseTweaks_resetLeftClickDragVariables();
+			inventoryTweaks_resetLeftClickDragVariables();
 		}
 	}
 
-	@Unique private boolean mouseTweaks_handleRightClick(int mouseX, int mouseY) {
+	@Unique private boolean inventoryTweaks_handleRightClick(int mouseX, int mouseY) {
 		/** - Get held item */
 		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
@@ -225,7 +225,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 1, isShiftKeyDown, this.minecraft.player);
 
 					if (isShiftKeyDown) {
-						mouseTweaks_resetRightClickDragVariables();
+						inventoryTweaks_resetRightClickDragVariables();
 					}
 				} else {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 1, false, this.minecraft.player);
@@ -238,7 +238,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private void mouseTweaks_handleRightClickDragMouseTweaks() {
+	@Unique private void inventoryTweaks_handleRightClickDragMouseTweaks() {
 		if (slot.id != lastRMBSlotId) {
 			ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
@@ -250,7 +250,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		}
 	}
 
-	@Unique private void mouseTweaks_handleRightClickDrag(ItemInstance slotItemToExamine) {
+	@Unique private void inventoryTweaks_handleRightClickDrag(ItemInstance slotItemToExamine) {
 		/** - First slot is handled instantly in mouseClicked function */
 		if (slot.id != lastRMBSlotId) {
 			if (0 == rightClickHoveredSlots.size())
@@ -277,7 +277,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		}
 	}
 
-	@Unique private boolean mouseTweaks_cancelRightClickDrag()
+	@Unique private boolean inventoryTweaks_cancelRightClickDrag()
 	{
 		/** - Cancel Right-click + Drag */
 		if (isRightClickDragStarted) {
@@ -294,7 +294,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				}
 
 				/** - Reset Right-click + Drag variables and exit function */
-				mouseTweaks_resetRightClickDragVariables();
+				inventoryTweaks_resetRightClickDragVariables();
 
 				return true;
 			}
@@ -303,7 +303,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private void mouseTweaks_resetRightClickDragVariables()
+	@Unique private void inventoryTweaks_resetRightClickDragVariables()
 	{
 		rightClickExistingAmount.clear();
 		rightClickHoveredSlots.clear();
@@ -312,7 +312,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		isRightClickDragStarted = false;
 	}
 
-	@Unique private boolean mouseTweaks_handleLeftClickWithItem(ItemInstance cursorStack, Slot clickedSlot) {
+	@Unique private boolean inventoryTweaks_handleLeftClickWithItem(ItemInstance cursorStack, Slot clickedSlot) {
 		/** - Ensure a slot was clicked */
 		if (clickedSlot != null) {
 			/** - Record how many items are in the slot and how many items are needed to fill the slot */
@@ -339,7 +339,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
 
 				if (isShiftKeyDown) {
-					mouseTweaks_resetLeftClickDragVariables();
+					inventoryTweaks_resetLeftClickDragVariables();
 					leftClickMouseTweaksPersistentStack = cursorStack;
 					isLeftClickDragMouseTweaksStarted = true;
 				}
@@ -353,7 +353,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private boolean mouseTweaks_handleLeftClickWithoutItem(Slot clickedSlot) {
+	@Unique private boolean inventoryTweaks_handleLeftClickWithoutItem(Slot clickedSlot) {
 		isLeftClickDragMouseTweaksStarted = true;
 
 		/** - Ensure a slot was clicked */
@@ -377,7 +377,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private void mouseTweaks_handleLeftClickDragMouseTweaks() {
+	@Unique private void inventoryTweaks_handleLeftClickDragMouseTweaks() {
 		if (slot.id != lastLMBSlotId) {
 			lastLMBSlotId = slot.id;
 
@@ -436,7 +436,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		}
 	}
 
-	@Unique private boolean mouseTweaks_handleLeftClickDrag()
+	@Unique private boolean inventoryTweaks_handleLeftClickDrag()
 	{
 		/** - Do nothing if slot has already been added to Left-click + Drag logic */
 		if (!leftClickHoveredSlots.contains(slot)) {
@@ -531,7 +531,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private boolean mouseTweaks_cancelLeftClickDrag()
+	@Unique private boolean inventoryTweaks_cancelLeftClickDrag()
 	{
 		/** - Cancel Left-click + Drag */
 		if (isLeftClickDragStarted) {
@@ -548,7 +548,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				}
 
 				/** - Reset Left-click + Drag variables and exit function */
-				mouseTweaks_resetLeftClickDragVariables();
+				inventoryTweaks_resetLeftClickDragVariables();
 				return true;
 			}
 		}
@@ -556,7 +556,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private void mouseTweaks_resetLeftClickDragVariables()
+	@Unique private void inventoryTweaks_resetLeftClickDragVariables()
 	{
 		leftClickExistingAmount.clear();
 		leftClickAmountToFillPersistent.clear();
@@ -572,7 +572,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	private boolean drawingHoveredSlot;
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;isMouseOverSlot(Lnet/minecraft/container/slot/Slot;II)Z"))
-	private boolean mouseTweaks_isMouseOverSlot(ContainerBase guiContainer, Slot slot, int x, int y) {
+	private boolean inventoryTweaks_isMouseOverSlot(ContainerBase guiContainer, Slot slot, int x, int y) {
 		return (  (drawingHoveredSlot = rightClickHoveredSlots.contains(slot))
 				|| (drawingHoveredSlot = leftClickHoveredSlots.contains(slot))
 				|| isMouseOverSlot(slot, x, y)
@@ -580,14 +580,14 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	}
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;fillGradient(IIIIII)V", ordinal = 0))
-	private void mouseTweaks_fillGradient(ContainerBase instance, int startX, int startY, int endX, int endY, int colorStart, int colorEnd) {
+	private void inventoryTweaks_fillGradient(ContainerBase instance, int startX, int startY, int endX, int endY, int colorStart, int colorEnd) {
 		if (colorStart != colorEnd) throw new AssertionError();
 		int color = drawingHoveredSlot ? 0x20ffffff : colorStart;
 		this.fillGradient(startX, startY, endX, endY, color, color);
 	}
 
 	@Inject(method = "keyPressed", at = @At("RETURN"))
-	private void mouseTweaks_keyPressed(char character, int keyCode, CallbackInfo ci) {
+	private void inventoryTweaks_keyPressed(char character, int keyCode, CallbackInfo ci) {
 		if (this.slot == null)
 			return;
 
