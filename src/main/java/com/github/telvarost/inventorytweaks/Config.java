@@ -50,6 +50,9 @@ public class Config {
 
     public static class MouseTweaksConfig {
 
+        @ConfigName("Cursor/Slot [ScrollWheel] transfer")
+        public static Boolean ScrollWheelTransfer = true;
+
         @ConfigName("Empty cursor [Shift + Left-Click + Drag]")
         @Comment("[Shift-Click] items of any type")
         public static Boolean LMBTweakShiftClickAny = true;

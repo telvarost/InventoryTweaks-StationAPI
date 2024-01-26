@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.abs;
+
 @Mixin(ContainerBase.class)
 public abstract class ContainerBaseMixin extends ScreenBase {
 	@Shadow
@@ -142,14 +144,23 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		if (slot == null)
 			return;
 
+		if (Config.MouseTweaksConfig.ScrollWheelTransfer) {
+			int currentWheelDegrees = Mouse.getDWheel();
+			if (  (0 != currentWheelDegrees)
+			   && (isLeftClickDragStarted == false)
+			   && (isRightClickDragStarted == false)
+			) {
+				inventoryTweaks_handleScrollWheel(currentWheelDegrees);
+			}
+		}
+
 		/** - Right-click + Drag logic = distribute one item from held items to each slot */
 		if (  ( button == -1 )
-				&& ( Mouse.isButtonDown(1) )
-				&& ( isLeftClickDragStarted == false )
-				&& ( isLeftClickDragMouseTweaksStarted == false )
-				&& ( rightClickPersistentStack != null )
-		)
-		{
+		   && ( Mouse.isButtonDown(1) )
+		   && ( isLeftClickDragStarted == false )
+		   && ( isLeftClickDragMouseTweaksStarted == false )
+		   && ( rightClickPersistentStack != null )
+		) {
 			ItemInstance slotItemToExamine = slot.getItem();
 
 			/** - Do nothing if slot item does not match held item or if the slot is full */
@@ -178,10 +189,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 		/** - Left-click + Drag logic = evenly distribute held items over slots */
 		if (  ( button == -1 )
-				&& ( Mouse.isButtonDown(0) )
-				&& ( isRightClickDragStarted == false )
-		)
-		{
+		   && ( Mouse.isButtonDown(0) )
+		   && ( isRightClickDragStarted == false )
+		) {
 			if (isLeftClickDragMouseTweaksStarted) {
 				inventoryTweaks_handleLeftClickDragMouseTweaks();
 			} else if ( leftClickPersistentStack != null ) {
@@ -193,6 +203,50 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			}
 		} else {
 			inventoryTweaks_resetLeftClickDragVariables();
+		}
+	}
+
+	@Unique private void inventoryTweaks_handleScrollWheel(int wheelDegrees) {
+		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+		ItemInstance slotItemToExamine = slot.getItem();
+
+		if (  (null != cursorStack)
+		   || (null != slotItemToExamine)
+		   )
+		{
+			float numberOfTurns = (float)wheelDegrees / 120.0f;
+			int cursorStackAmount = 0;
+			int slotStackAmount = 0;
+			ItemInstance itemBeingTransfered = null;
+
+			if (null != cursorStack) {
+				itemBeingTransfered = cursorStack;
+				cursorStackAmount = cursorStack.count;
+			}
+
+			if (null != slotItemToExamine) {
+				itemBeingTransfered = slotItemToExamine;
+				slotStackAmount = slotItemToExamine.count;
+			}
+
+			if (0 > numberOfTurns) {
+				if (0 != cursorStackAmount) {
+					if (slotStackAmount != itemBeingTransfered.getMaxStackSize()) {
+						for (int turnIndex = 0; turnIndex < abs(numberOfTurns); turnIndex++) {
+							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
+						}
+					}
+				}
+			} else {
+				if (0 != slotStackAmount) {
+					for (int turnIndex = 0; turnIndex < abs(numberOfTurns); turnIndex++) {
+						if (cursorStackAmount != itemBeingTransfered.getMaxStackSize()) {
+							slot.setStack(new ItemInstance(itemBeingTransfered.itemId, (slotStackAmount - 1), itemBeingTransfered.getDamage()));
+							minecraft.player.inventory.setCursorItem(new ItemInstance(itemBeingTransfered.itemId, (cursorStackAmount + 1), itemBeingTransfered.getDamage()));
+						}
+					}
+				}
+			}
 		}
 	}
 
