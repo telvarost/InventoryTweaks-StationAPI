@@ -35,7 +35,7 @@ public class Config {
         public static Boolean LCtrlStackDrop = true;
 
         @ConfigName("Use [NUMBER_KEYS] to swap items to hotbar")
-        @Comment("Hover over the slot or move cursor item to hotbar")
+        @Comment("Hover over the slot or swap cursor item")
         public static Boolean NumKeyHotbarSwap = true;
     }
 
