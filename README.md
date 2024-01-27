@@ -26,6 +26,9 @@ This mod is currently incompatible with the regular version of MojangFix. If you
     * Move items to another inventory if holding `Shift`
 * MouseTweaks `Left-Click + Drag + Shift` (without item)
     * Quickly move items into another inventory.
+* Original take on the scroll wheel
+  * Scroll to move items between the cursor and the hovered slot
+  * Note: MouseTweaks scroll will eventually be added as well if I can figure it out
 
 ## Installation using Prism Launcher
 
