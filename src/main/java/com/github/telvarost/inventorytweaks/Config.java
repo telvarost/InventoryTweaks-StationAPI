@@ -77,24 +77,24 @@ public class Config {
         @Comment("For cursor/slot item transfer")
         public static Boolean invertScrollCursorSlotDirection = false;
 
-        @ConfigName("Invert scroll direction: inventories")
-        @Comment("For item transfer between inventories")
-        public static Boolean invertScrollInventoryDirection = false;
-
-        @ConfigName("Position aware scrolling inventory transfer")
-        @Comment("Slot position will determine scroll direction")
-        public static Boolean positionAwareScrolling = false;
-
-        @ConfigName("Wheel slot search order (see comment)")
-        @Comment("true = first to last, false = last to first")
-        public static Boolean wheelSearchOrder = true;
-
-        @ConfigName("[ScrollWheel] transfer (see comment)")
-        @Comment("true = cursor/slot, false = inventories")
-        public static Boolean scrollWheelBehavior = true;
-
-        @ConfigName("[Shift + ScrollWheel] transfer (see comment)")
-        @Comment("true = inventories, false = cursor/slot")
-        public static Boolean shiftScrollWheelBehavior = true;
+//        @ConfigName("Invert scroll direction: inventories")
+//        @Comment("For item transfer between inventories")
+//        public static Boolean invertScrollInventoryDirection = false;
+//
+//        @ConfigName("Position aware scrolling inventory transfer")
+//        @Comment("Slot position will determine scroll direction")
+//        public static Boolean positionAwareScrolling = false;
+//
+//        @ConfigName("Wheel slot search order (see comment)")
+//        @Comment("true = first to last, false = last to first")
+//        public static Boolean wheelSearchOrder = true;
+//
+//        @ConfigName("[ScrollWheel] transfer (see comment)")
+//        @Comment("true = cursor/slot, false = inventories")
+//        public static Boolean scrollWheelBehavior = true;
+//
+//        @ConfigName("[Shift + ScrollWheel] transfer (see comment)")
+//        @Comment("true = inventories, false = cursor/slot")
+//        public static Boolean shiftScrollWheelBehavior = true;
     }
 }
