@@ -10,10 +10,25 @@ This mod is currently incompatible with the regular version of MojangFix. If you
 
 ## List of Changes:
 
+* Note that all changes can be enabled/disabled in the config menu if you have ModMenu and GlassConfigAPI.
+
+### Modern Minecraft Changes
 * Adds `Left-Click + Drag` mechanic to evenly distribute held items over empty slots/slots with the same item as in modern Minecraft.
 * Adds `Right-Click + Drag` mechanic to distribute one item from held items over empty slots/slots with the same item as in modern Minecraft.
 * `LCtrl + DROP_KEY` to drop a whole stack of items.
 * Move items from player inventory to the hotbar by pressing the number key corresponding to the desired hotbar slot while hovering the cursor over the item to move.
+
+### MouseTweaks Changes
+* MouseTweaks `Right-Click + Drag`
+    * Very similar to the standard RMB dragging mechanic, with one difference: if you drag over a slot multiple times, an item will be put there multiple times. Replaces the standard mechanic if enabled.
+* MouseTweaks `Left-Click + Drag` (with item)
+    * Lets you quickly pick up or move items of the same type.
+    * Move items to another inventory if holding `Shift`
+* MouseTweaks `Left-Click + Drag + Shift` (without item)
+    * Quickly move items into another inventory.
+* Original take on the scroll wheel
+  * Scroll to move items between the cursor and the hovered slot
+  * Note: MouseTweaks scroll will eventually be added as well if I can figure it out
 
 ## Installation using Prism Launcher
 
