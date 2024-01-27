@@ -144,7 +144,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		if (slot == null)
 			return;
 
-		if (Config.MouseTweaksConfig.ScrollWheelTransfer) {
+		if (Config.ScrollWheelConfig.enableScrollWheelTweaks) {
 			int currentWheelDegrees = Mouse.getDWheel();
 			if (  (0 != currentWheelDegrees)
 			   && (isLeftClickDragStarted == false)
@@ -214,10 +214,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		   || (null != slotItemToExamine)
 		   )
 		{
+			boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 			float numberOfTurns = (float)wheelDegrees / 120.0f;
 			int cursorStackAmount = 0;
 			int slotStackAmount = 0;
 			ItemInstance itemBeingTransfered = null;
+
+			if (Config.ScrollWheelConfig.invertScrollWheelDirection) {
+				numberOfTurns *= -1;
+			}
 
 			if (null != cursorStack) {
 				itemBeingTransfered = cursorStack;
@@ -229,25 +234,54 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				slotStackAmount = slotItemToExamine.count;
 			}
 
-			if (0 > numberOfTurns) {
-				if (0 != cursorStackAmount) {
-					if (slotStackAmount != itemBeingTransfered.getMaxStackSize()) {
-						for (int turnIndex = 0; turnIndex < abs(numberOfTurns); turnIndex++) {
-							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 1, false, this.minecraft.player);
-						}
-					}
+			if (isShiftKeyDown) {
+				if (Config.ScrollWheelConfig.shiftScrollWheelBehavior) {
+
+				} else {
+					inventoryTweaks_scrollCursorSlotTransfer(numberOfTurns, cursorStackAmount, slotStackAmount, itemBeingTransfered);
 				}
 			} else {
-				if (0 != slotStackAmount) {
-					for (int turnIndex = 0; turnIndex < abs(numberOfTurns); turnIndex++) {
-						if (cursorStackAmount != itemBeingTransfered.getMaxStackSize()) {
-							slot.setStack(new ItemInstance(itemBeingTransfered.itemId, (slotStackAmount - 1), itemBeingTransfered.getDamage()));
-							minecraft.player.inventory.setCursorItem(new ItemInstance(itemBeingTransfered.itemId, (cursorStackAmount + 1), itemBeingTransfered.getDamage()));
+				if (Config.ScrollWheelConfig.scrollWheelBehavior) {
+					inventoryTweaks_scrollCursorSlotTransfer(numberOfTurns, cursorStackAmount, slotStackAmount, itemBeingTransfered);
+				} else {
+
+				}
+			}
+		}
+	}
+
+	@Unique private void inventoryTweaks_scrollCursorSlotTransfer(float numTurns, int cursorAmount, int slotAmount, ItemInstance transferItem) {
+		if (0 > numTurns) {
+			if (0 != cursorAmount) {
+				for (int turnIndex = 0; turnIndex < abs(numTurns); turnIndex++) {
+					if (slotAmount != transferItem.getMaxStackSize()) {
+						if (0 == (cursorAmount - 1)) {
+							minecraft.player.inventory.setCursorItem(null);
+						} else {
+							minecraft.player.inventory.setCursorItem(new ItemInstance(transferItem.itemId, (cursorAmount - 1), transferItem.getDamage()));
 						}
+						slot.setStack(new ItemInstance(transferItem.itemId, (slotAmount + 1), transferItem.getDamage()));
+					}
+				}
+			}
+		} else {
+			if (0 != slotAmount) {
+				for (int turnIndex = 0; turnIndex < abs(numTurns); turnIndex++) {
+					if (cursorAmount != transferItem.getMaxStackSize()) {
+						if (0 == (slotAmount - 1)) {
+							slot.setStack(null);
+						} else {
+							slot.setStack(new ItemInstance(transferItem.itemId, (slotAmount - 1), transferItem.getDamage()));
+						}
+						minecraft.player.inventory.setCursorItem(new ItemInstance(transferItem.itemId, (cursorAmount + 1), transferItem.getDamage()));
 					}
 				}
 			}
 		}
+	}
+
+	@Unique private void inventoryTweaks_scrollInventoryTransfer() {
+
 	}
 
 	@Unique private boolean inventoryTweaks_handleRightClick(int mouseX, int mouseY) {

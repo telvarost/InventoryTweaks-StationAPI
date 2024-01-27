@@ -50,19 +50,8 @@ public class Config {
 
     public static class MouseTweaksConfig {
 
-        /** @todo - All of the comments below */
-        // Turn this into a category with submenus and implement the following
-        // - Invert scroll wheel direction -> default false
-        // - Position aware scrolling (inventory scroll action) -> default false
-        //   - Slot position will determine scroll direction
-        // - Transfer between cursor and slot
-        //   - Hit shift to transfer between inventories
-        // - Transfer between inventories without shift
-        //   - If true disable transfer between cursor and slot
-        // - WheelSearchOrder true equals first to last
-        //   - Make false for last to first
-        @ConfigName("Cursor/Slot [ScrollWheel] transfer")
-        public static Boolean ScrollWheelTransfer = true;
+        @ConfigCategory("Scroll Wheel Config")
+        public static final ScrollWheelConfig SCROLL_WHEEL_CONFIG = new ScrollWheelConfig();
 
         @ConfigName("Empty cursor [Shift + Left-Click + Drag]")
         @Comment("[Shift-Click] items of any type")
@@ -77,5 +66,30 @@ public class Config {
 
         @ConfigName("[Left-Click + Drag] to pick up items")
         public static Boolean LMBTweakPickUp = true;
+    }
+
+    public static class ScrollWheelConfig {
+
+        @ConfigName("Enable Scroll Wheel Tweaks")
+        public static Boolean enableScrollWheelTweaks = true;
+
+        @ConfigName("Invert scroll wheel direction")
+        public static Boolean invertScrollWheelDirection = false;
+
+        @ConfigName("Position aware scrolling (inventory transfer)")
+        @Comment("Slot position will determine scroll direction")
+        public static Boolean positionAwareScrolling = false;
+
+        @ConfigName("Wheel slot search order (see comment)")
+        @Comment("true = first to last, false = last to first")
+        public static Boolean wheelSearchOrder = true;
+
+        @ConfigName("[ScrollWheel] transfer (see comment)")
+        @Comment("true = cursor/slot, false = inventories")
+        public static Boolean scrollWheelBehavior = true;
+
+        @ConfigName("[Shift + ScrollWheel] transfer (see comment)")
+        @Comment("true = inventories, false = cursor/slot")
+        public static Boolean shiftScrollWheelBehavior = true;
     }
 }
