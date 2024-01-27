@@ -73,10 +73,15 @@ public class Config {
         @ConfigName("Enable Scroll Wheel Tweaks")
         public static Boolean enableScrollWheelTweaks = true;
 
-        @ConfigName("Invert scroll wheel direction")
-        public static Boolean invertScrollWheelDirection = false;
+        @ConfigName("Invert scroll direction: cursor/slot")
+        @Comment("For cursor/slot item transfer")
+        public static Boolean invertScrollCursorSlotDirection = false;
 
-        @ConfigName("Position aware scrolling (inventory transfer)")
+        @ConfigName("Invert scroll direction: inventories")
+        @Comment("For item transfer between inventories")
+        public static Boolean invertScrollInventoryDirection = false;
+
+        @ConfigName("Position aware scrolling inventory transfer")
         @Comment("Slot position will determine scroll direction")
         public static Boolean positionAwareScrolling = false;
 

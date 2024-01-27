@@ -220,10 +220,6 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			int slotStackAmount = 0;
 			ItemInstance itemBeingTransfered = null;
 
-			if (Config.ScrollWheelConfig.invertScrollWheelDirection) {
-				numberOfTurns *= -1;
-			}
-
 			if (null != cursorStack) {
 				itemBeingTransfered = cursorStack;
 				cursorStackAmount = cursorStack.count;
@@ -236,7 +232,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 			if (isShiftKeyDown) {
 				if (Config.ScrollWheelConfig.shiftScrollWheelBehavior) {
-
+					inventoryTweaks_scrollInventoryTransfer(numberOfTurns, cursorStackAmount, slotStackAmount, itemBeingTransfered);
 				} else {
 					inventoryTweaks_scrollCursorSlotTransfer(numberOfTurns, cursorStackAmount, slotStackAmount, itemBeingTransfered);
 				}
@@ -244,14 +240,19 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				if (Config.ScrollWheelConfig.scrollWheelBehavior) {
 					inventoryTweaks_scrollCursorSlotTransfer(numberOfTurns, cursorStackAmount, slotStackAmount, itemBeingTransfered);
 				} else {
-
+					inventoryTweaks_scrollInventoryTransfer(numberOfTurns, cursorStackAmount, slotStackAmount, itemBeingTransfered);
 				}
 			}
 		}
 	}
 
 	@Unique private void inventoryTweaks_scrollCursorSlotTransfer(float numTurns, int cursorAmount, int slotAmount, ItemInstance transferItem) {
+		if (Config.ScrollWheelConfig.invertScrollCursorSlotDirection) {
+			numTurns *= -1;
+		}
+
 		if (0 > numTurns) {
+			/** - Transfer items to slot from cursor */
 			if (0 != cursorAmount) {
 				for (int turnIndex = 0; turnIndex < abs(numTurns); turnIndex++) {
 					if (slotAmount != transferItem.getMaxStackSize()) {
@@ -265,6 +266,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				}
 			}
 		} else {
+			/** - Transfer items to cursor from slot */
 			if (0 != slotAmount) {
 				for (int turnIndex = 0; turnIndex < abs(numTurns); turnIndex++) {
 					if (cursorAmount != transferItem.getMaxStackSize()) {
@@ -280,8 +282,25 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		}
 	}
 
-	@Unique private void inventoryTweaks_scrollInventoryTransfer() {
+	@Unique private void inventoryTweaks_scrollInventoryTransfer(float numTurns, int cursorAmount, int slotAmount, ItemInstance transferItem) {
+		if (Config.ScrollWheelConfig.invertScrollInventoryDirection) {
+			numTurns *= -1;
+		}
 
+		if (0 > numTurns) {
+			/** - Transfer items out of slot */
+			if (0 != slotAmount) {
+				for (int turnIndex = 0; turnIndex < abs(numTurns); turnIndex++) {
+				}
+			}
+		} else {
+			/** - Transfer items into slot */
+			boolean itemExistsInContainer = false;
+			if (itemExistsInContainer) {
+				for (int turnIndex = 0; turnIndex < abs(numTurns); turnIndex++) {
+				}
+			}
+		}
 	}
 
 	@Unique private boolean inventoryTweaks_handleRightClick(int mouseX, int mouseY) {
