@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "InventoryTweaks",
-  "description": "Inventory tweaks for b1.7.3 with StationAPI.",
+  "description": "Inventory tweaks for b1.7.3 with StationAPI. Special thanks to YaLTeR and js6pak for inspiring a lot of the concepts in this mod.",
   "authors": [
     "Telvarost"
   ],
