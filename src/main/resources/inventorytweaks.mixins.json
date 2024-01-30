@@ -4,12 +4,12 @@
   "package": "com.github.telvarost.inventorytweaks.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ContainerBaseMixin",
-    "PlayerMixin"
   ],
   "server": [
   ],
   "client": [
+    "ContainerBaseMixin",
+    "PlayerMixin",
     "MinecraftAccessor"
   ],
   "injectors": {

@@ -655,7 +655,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				/** - Distribute fewer items to slots whose max stack size will be filled */
 				do {
 					rerunLoop = false;
-					if (0 != numberOfSlotsRemainingToFill) {
+					if (0 < numberOfSlotsRemainingToFill) {
 						itemsPerSlot = leftClickRemainingItemAmount / numberOfSlotsRemainingToFill;
 
 						if (0 != itemsPerSlot)
@@ -675,7 +675,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							}
 						}
 					}
-				} while (rerunLoop && 0 != numberOfSlotsRemainingToFill);
+				} while (rerunLoop && 0 < numberOfSlotsRemainingToFill);
 
 				/** - Distribute remaining items evenly over remaining slots that were not already filled to max stack size */
 				for (int distributeSlotsIndex = 0; distributeSlotsIndex < leftClickHoveredSlots.size(); distributeSlotsIndex++) {
