@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerMixin {
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
     private void inventoryTweaks_dropSelectedItem(CallbackInfo ci) {
-        if (!Config.ModernMinecraftConfig.LCtrlStackDrop) {
+        if (!Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.LCtrlStackDrop) {
             return;
         }
 

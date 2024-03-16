@@ -91,7 +91,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			if (!inventoryTweaks_cancelLeftClickDrag()) {
 
 				/** - Handle Right-click */
-				if (Config.ModernMinecraftConfig.EnableRightClickDrag) {
+				if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableRightClickDrag) {
 					exitFunction = inventoryTweaks_handleRightClick(mouseX, mouseY);
 				}
 			} else {
@@ -117,7 +117,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (cursorStack != null) {
-					if (Config.ModernMinecraftConfig.EnableLeftClickDrag) {
+					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableLeftClickDrag) {
 						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot);
 					}
 				} else {
@@ -144,7 +144,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		if (slot == null)
 			return;
 
-		if (Config.ScrollWheelConfig.enableScrollWheelTweaks) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.SCROLL_WHEEL_CONFIG.enableScrollWheelTweaks) {
 			int currentWheelDegrees = Mouse.getDWheel();
 			if (  (0 != currentWheelDegrees)
 			   && (isLeftClickDragStarted == false)
@@ -180,7 +180,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 			if (!rightClickHoveredSlots.contains(slot)) {
 				inventoryTweaks_handleRightClickDrag(slotItemToExamine);
-			} else if (Config.MouseTweaksConfig.RMBTweak) {
+			} else if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.RMBTweak) {
 				inventoryTweaks_handleRightClickDragMouseTweaks();
 			}
 		} else {
@@ -257,7 +257,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	}
 
 	@Unique private void inventoryTweaks_scrollCursorSlotTransfer(float numTurns, int cursorAmount, int slotAmount, ItemInstance transferItem) {
-		if (Config.ScrollWheelConfig.invertScrollCursorSlotDirection) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.SCROLL_WHEEL_CONFIG.invertScrollCursorSlotDirection) {
 			numTurns *= -1;
 		}
 
@@ -357,14 +357,20 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
 		/** - Handle Right-click if an item is held */
-		if (cursorStack != null) {
+		if (null != cursorStack) {
 
 			/** - Ensure a slot was clicked */
 			Slot clickedSlot = this.getSlot(mouseX, mouseY);
-			if (clickedSlot != null) {
+			if (null != clickedSlot) {
 
 				/** - Record how many items are in the slot */
 				if (null != clickedSlot.getItem()) {
+
+					/** - Let vanilla minecraft handle right click with an item onto a different item */
+					if (cursorStack.itemId != clickedSlot.getItem().itemId) {
+						return false;
+					}
+
 					rightClickExistingAmount.add(clickedSlot.getItem().count);
 				} else {
 					rightClickExistingAmount.add(0);
@@ -380,7 +386,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				/** - Handle initial Right-click */
 				lastRMBSlotId = clickedSlot.id;
 				lastRMBSlot = clickedSlot;
-				if (Config.ModernMinecraftConfig.RMBPreferShiftClick) {
+				if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.RMBPreferShiftClick) {
 					boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 1, isShiftKeyDown, this.minecraft.player);
 
@@ -474,9 +480,18 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Unique private boolean inventoryTweaks_handleLeftClickWithItem(ItemInstance cursorStack, Slot clickedSlot) {
 		/** - Ensure a slot was clicked */
-		if (clickedSlot != null) {
+		if (null != clickedSlot) {
+
 			/** - Record how many items are in the slot and how many items are needed to fill the slot */
 			if (null != clickedSlot.getItem()) {
+
+				/** - Let vanilla minecraft handle left click with an item onto a different item */
+				if (null != cursorStack) {
+					if (cursorStack.itemId != clickedSlot.getItem().itemId) {
+						return false;
+					}
+				}
+
 				leftClickAmountToFillPersistent.add(cursorStack.getMaxStackSize() - clickedSlot.getItem().count);
 				leftClickExistingAmount.add(clickedSlot.getItem().count);
 			} else {
@@ -494,7 +509,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			/** - Handle initial Left-click */
 			lastLMBSlotId = clickedSlot.id;
 			lastLMBSlot = clickedSlot;
-			if (Config.ModernMinecraftConfig.LMBPreferShiftClick) {
+			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.LMBPreferShiftClick) {
 				boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
 
@@ -549,12 +564,12 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					if (slotItemToExamine.isDamageAndIDIdentical(leftClickMouseTweaksPersistentStack))
 					{
 						if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-							if (Config.MouseTweaksConfig.LMBTweakShiftClick)
+							if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.LMBTweakShiftClick)
 							{
 								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, true, this.minecraft.player);
 							}
 						} else {
-							if (Config.MouseTweaksConfig.LMBTweakPickUp) {
+							if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.LMBTweakPickUp) {
 								ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 
 								if (cursorStack == null) {
@@ -585,7 +600,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							}
 						}
 					}
-				} else if (  (Config.MouseTweaksConfig.LMBTweakShiftClickAny)
+				} else if (  (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.LMBTweakShiftClickAny)
 						&& (  (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
 						|| (Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
 				)
@@ -733,7 +748,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;isMouseOverSlot(Lnet/minecraft/container/slot/Slot;II)Z"))
 	private boolean inventoryTweaks_isMouseOverSlot(ContainerBase guiContainer, Slot slot, int x, int y) {
-		if (Config.ModernMinecraftConfig.EnableDragGraphics) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableDragGraphics) {
 			return (  (drawingHoveredSlot = rightClickHoveredSlots.contains(slot))
 				   || (drawingHoveredSlot = leftClickHoveredSlots.contains(slot))
 				   || isMouseOverSlot(slot, x, y)
@@ -745,7 +760,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/container/ContainerBase;fillGradient(IIIIII)V", ordinal = 0))
 	private void inventoryTweaks_fillGradient(ContainerBase instance, int startX, int startY, int endX, int endY, int colorStart, int colorEnd) {
-		if (Config.ModernMinecraftConfig.EnableDragGraphics) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableDragGraphics) {
 			if (colorStart != colorEnd) throw new AssertionError();
 			int color = drawingHoveredSlot ? 0x20ffffff : colorStart;
 			this.fillGradient(startX, startY, endX, endY, color, color);
@@ -760,14 +775,14 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			return;
 		}
 
-		if (Config.ModernMinecraftConfig.UseDropKeyInInventory) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.UseDropKeyInInventory) {
 			if (keyCode == this.minecraft.options.dropKey.key) {
 				if (this.minecraft.player.inventory.getCursorItem() != null) {
 					return;
 				}
 
 				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
-				if (Config.ModernMinecraftConfig.LCtrlStackDrop) {
+				if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.LCtrlStackDrop) {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, -999, Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) ? 0 : 1, false, this.minecraft.player);
 				} else {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, -999, 1, false, this.minecraft.player);
@@ -776,7 +791,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			}
 		}
 
-		if (Config.ModernMinecraftConfig.NumKeyHotbarSwap) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.NumKeyHotbarSwap) {
 			if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9) {
 				if (this.minecraft.player.inventory.getCursorItem() == null) {
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
