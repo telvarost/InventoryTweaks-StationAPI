@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.screen.container.ContainerBase;
 import net.minecraft.item.ItemInstance;
 import net.minecraft.container.slot.Slot;
+import net.modificationstation.stationapi.api.network.ModdedPacketHandler;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -82,6 +83,10 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		isLeftClickDragMouseTweaksStarted = false;
+
+		/** - Check for if client is on a vanilla server */
+		ModdedPacketHandler moddedPacketHandler = (ModdedPacketHandler) minecraft.getNetworkHandler();
+		boolean isVanillaServer = (null == moddedPacketHandler || moddedPacketHandler.isModded()) ? false : true;
 
 		/** - Right-click */
 		if (button == 1) {
