@@ -1,9 +1,7 @@
 package com.github.telvarost.inventorytweaks;
 
 import blue.endless.jankson.Comment;
-import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
-import net.glasslauncher.mods.api.gcapi.api.ConfigName;
-import net.glasslauncher.mods.api.gcapi.api.GConfig;
+import net.glasslauncher.mods.api.gcapi.api.*;
 
 public class Config {
 
@@ -71,6 +69,7 @@ public class Config {
     public static class ScrollWheelConfig {
 
         @ConfigName("Enable Scroll Wheel Tweaks")
+        @ValueOnVanillaServer(booleanValue = TriBoolean.FALSE)
         public Boolean enableScrollWheelTweaks = true;
 
         @ConfigName("Invert scroll direction: cursor/slot")

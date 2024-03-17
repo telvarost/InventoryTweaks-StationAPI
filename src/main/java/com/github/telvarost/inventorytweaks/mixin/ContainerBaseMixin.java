@@ -93,7 +93,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			boolean exitFunction = false;
 
 			/** - Should click cancel Left-click + Drag */
-			if (!inventoryTweaks_cancelLeftClickDrag()) {
+			if (!inventoryTweaks_cancelLeftClickDrag(isVanillaServer)) {
 
 				/** - Handle Right-click */
 				if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableRightClickDrag) {
@@ -116,7 +116,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			boolean exitFunction = false;
 
 			/** - Should click cancel Right-click + Drag */
-			if (!inventoryTweaks_cancelRightClickDrag()) {
+			if (!inventoryTweaks_cancelRightClickDrag(isVanillaServer)) {
 
 				/** - Handle Left-click */
 				ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
@@ -448,19 +448,21 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		}
 	}
 
-	@Unique private boolean inventoryTweaks_cancelRightClickDrag()
+	@Unique private boolean inventoryTweaks_cancelRightClickDrag(boolean isVanillaServer)
 	{
 		/** - Cancel Right-click + Drag */
 		if (isRightClickDragStarted) {
 			if (rightClickHoveredSlots.size() > 1) {
-
-				/** - Return all slots to normal */
-				minecraft.player.inventory.setCursorItem(new ItemInstance(rightClickPersistentStack.itemId, rightClickItemAmount, rightClickPersistentStack.getDamage()));
-				for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < rightClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
-					if (0 != rightClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
-						rightClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(rightClickPersistentStack.itemId, rightClickExistingAmount.get(leftClickHoveredSlotsIndex), rightClickPersistentStack.getDamage()));
-					} else {
-						rightClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
+				/** - Slots cannot return to normal on a vanilla server */
+				if (!isVanillaServer) {
+					/** - Return all slots to normal */
+					minecraft.player.inventory.setCursorItem(new ItemInstance(rightClickPersistentStack.itemId, rightClickItemAmount, rightClickPersistentStack.getDamage()));
+					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < rightClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
+						if (0 != rightClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
+							rightClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(rightClickPersistentStack.itemId, rightClickExistingAmount.get(leftClickHoveredSlotsIndex), rightClickPersistentStack.getDamage()));
+						} else {
+							rightClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
+						}
 					}
 				}
 
@@ -711,19 +713,21 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private boolean inventoryTweaks_cancelLeftClickDrag()
+	@Unique private boolean inventoryTweaks_cancelLeftClickDrag(boolean isVanillaServer)
 	{
 		/** - Cancel Left-click + Drag */
 		if (isLeftClickDragStarted) {
 			if (leftClickHoveredSlots.size() > 1) {
-
-				/** - Return all slots to normal */
-				minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
-				for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
-					if (0 != leftClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
-						leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(leftClickPersistentStack.itemId, leftClickExistingAmount.get(leftClickHoveredSlotsIndex), leftClickPersistentStack.getDamage()));
-					} else {
-						leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
+				/** - Slots cannot return to normal on a vanilla server */
+				if (!isVanillaServer) {
+					/** - Return all slots to normal */
+					minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
+					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
+						if (0 != leftClickExistingAmount.get(leftClickHoveredSlotsIndex)) {
+							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(leftClickPersistentStack.itemId, leftClickExistingAmount.get(leftClickHoveredSlotsIndex), leftClickPersistentStack.getDamage()));
+						} else {
+							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
+						}
 					}
 				}
 
