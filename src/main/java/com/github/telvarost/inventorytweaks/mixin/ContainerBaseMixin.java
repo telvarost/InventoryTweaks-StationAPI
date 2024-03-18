@@ -716,6 +716,20 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							}
 						}
 					} while (rerunLoop && 0 < numberOfSlotsRemainingToFill);
+				} else {
+					/** - Return slots to normal on vanilla server */
+					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < (leftClickHoveredSlots.size() - 1); leftClickHoveredSlotsIndex++)
+					{
+						ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+						if (leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).hasItem() && leftClickHoveredSlots.size() > 1)
+						{
+							if (cursorStack != null)
+							{
+								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
+							}
+							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
+						}
+					}
 				}
 
 				/** - Distribute remaining items evenly over remaining slots that were not already filled to max stack size */
@@ -745,7 +759,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		/** - Cancel Left-click + Drag */
 		if (isLeftClickDragStarted) {
 			if (leftClickHoveredSlots.size() > 1) {
-				/** - Slots cannot return to normal on a vanilla server */
+				/** - Check if client is running on a vanilla server or not */
 				if (!isVanillaServer) {
 					/** - Return all slots to normal */
 					minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
@@ -754,6 +768,20 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(new ItemInstance(leftClickPersistentStack.itemId, leftClickExistingAmount.get(leftClickHoveredSlotsIndex), leftClickPersistentStack.getDamage()));
 						} else {
 							leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).setStack(null);
+						}
+					}
+				} else {
+					/** - Return slots to normal on vanilla server */
+					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < (leftClickHoveredSlots.size() - 1); leftClickHoveredSlotsIndex++)
+					{
+						ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
+						if (leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).hasItem() && leftClickHoveredSlots.size() > 1)
+						{
+							if (cursorStack != null)
+							{
+								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
+							}
+							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
 						}
 					}
 				}
