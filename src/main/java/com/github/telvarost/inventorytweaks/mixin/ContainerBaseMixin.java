@@ -84,17 +84,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		isLeftClickDragMouseTweaksStarted = false;
 
-		/** - Check if client is on a vanilla server */
-		ModdedPacketHandler moddedPacketHandler = (ModdedPacketHandler) minecraft.getNetworkHandler();
-		//boolean isVanillaServer = (null == moddedPacketHandler || moddedPacketHandler.isModded()) ? false : true;
-		boolean isVanillaServer = true;
+		/** - Check if client is on a server */
+		boolean isClientOnServer = minecraft.level.isServerSide;
 
 		/** - Right-click */
 		if (button == 1) {
 			boolean exitFunction = false;
 
 			/** - Should click cancel Left-click + Drag */
-			if (!inventoryTweaks_cancelLeftClickDrag(isVanillaServer)) {
+			if (!inventoryTweaks_cancelLeftClickDrag(isClientOnServer)) {
 
 				/** - Handle Right-click */
 				if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableRightClickDrag) {
@@ -117,14 +115,14 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			boolean exitFunction = false;
 
 			/** - Should click cancel Right-click + Drag */
-			if (!inventoryTweaks_cancelRightClickDrag(isVanillaServer)) {
+			if (!inventoryTweaks_cancelRightClickDrag(isClientOnServer)) {
 
 				/** - Handle Left-click */
 				ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (cursorStack != null) {
 					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableLeftClickDrag) {
-						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot, isVanillaServer);
+						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot, isClientOnServer);
 					}
 				} else {
 					exitFunction = inventoryTweaks_handleLeftClickWithoutItem(clickedSlot);
@@ -449,13 +447,13 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		}
 	}
 
-	@Unique private boolean inventoryTweaks_cancelRightClickDrag(boolean isVanillaServer)
+	@Unique private boolean inventoryTweaks_cancelRightClickDrag(boolean isClientOnServer)
 	{
 		/** - Cancel Right-click + Drag */
 		if (isRightClickDragStarted) {
 			if (rightClickHoveredSlots.size() > 1) {
-				/** - Slots cannot return to normal on a vanilla server */
-				if (!isVanillaServer) {
+				/** - Slots cannot return to normal on a server */
+				if (!isClientOnServer) {
 					/** - Return all slots to normal */
 					minecraft.player.inventory.setCursorItem(new ItemInstance(rightClickPersistentStack.itemId, rightClickItemAmount, rightClickPersistentStack.getDamage()));
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < rightClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
@@ -486,7 +484,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		isRightClickDragStarted = false;
 	}
 
-	@Unique private boolean inventoryTweaks_handleLeftClickWithItem(ItemInstance cursorStack, Slot clickedSlot, boolean isVanillaServer) {
+	@Unique private boolean inventoryTweaks_handleLeftClickWithItem(ItemInstance cursorStack, Slot clickedSlot, boolean isClientOnServer) {
 		/** - Ensure a slot was clicked */
 		if (null != clickedSlot) {
 
@@ -495,7 +493,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 				if (null != cursorStack) {
 					/** - Let vanilla minecraft handle left click with an item onto any item */
-					if (isVanillaServer) {
+					if (isClientOnServer) {
 						return false;
 					}
 
@@ -630,15 +628,13 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		if (!leftClickHoveredSlots.contains(slot)) {
 			ItemInstance slotItemToExamine = slot.getItem();
 
-			/** - Check if client is on a vanilla server */
-			ModdedPacketHandler moddedPacketHandler = (ModdedPacketHandler) minecraft.getNetworkHandler();
-			//boolean isVanillaServer = (null == moddedPacketHandler || moddedPacketHandler.isModded()) ? false : true;
-			boolean isVanillaServer = true;
+			/** - Check if client is on a server */
+			boolean isClientOnServer = minecraft.level.isServerSide;
 
 			/** - Do nothing if slot item does not match held item */
 			if (null != slotItemToExamine){
 
-				if (isVanillaServer) {
+				if (isClientOnServer) {
 					return true;
 				}
 
@@ -674,9 +670,9 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					leftClickExistingAmount.add(0);
 				}
 
-				/** - Slots cannot return to normal on a vanilla server */
+				/** - Slots cannot return to normal on a server */
 				List<Integer> leftClickAmountToFill = new ArrayList<>();
-				if (!isVanillaServer) {
+				if (!isClientOnServer) {
 					/** - Return all slots to normal */
 					minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
@@ -695,8 +691,8 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				int leftClickRemainingItemAmount = leftClickItemAmount;
 				boolean rerunLoop;
 
-				/** - Slots cannot return to normal on a vanilla server */
-				if (!isVanillaServer) {
+				/** - Slots cannot return to normal on a server */
+				if (!isClientOnServer) {
 					/** - Distribute fewer items to slots whose max stack size will be filled */
 					do {
 						rerunLoop = false;
@@ -721,7 +717,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					} while (rerunLoop && 0 < numberOfSlotsRemainingToFill);
 				} else {
-					/** - Return slots to normal on vanilla server */
+					/** - Return slots to normal on when client is on a server */
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < (leftClickHoveredSlots.size() - 1); leftClickHoveredSlotsIndex++)
 					{
 						ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
@@ -738,7 +734,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 				/** - Distribute remaining items evenly over remaining slots that were not already filled to max stack size */
 				for (int distributeSlotsIndex = 0; distributeSlotsIndex < leftClickHoveredSlots.size(); distributeSlotsIndex++) {
-					if (isVanillaServer) {
+					if (isClientOnServer) {
 						if (0 != leftClickAmountToFillPersistent.get(distributeSlotsIndex)) {
 							for (int addSlotIndex = 0; addSlotIndex < itemsPerSlot; addSlotIndex++) {
 								this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(distributeSlotsIndex).id, 1, false, this.minecraft.player);
@@ -758,13 +754,13 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		return false;
 	}
 
-	@Unique private boolean inventoryTweaks_cancelLeftClickDrag(boolean isVanillaServer)
+	@Unique private boolean inventoryTweaks_cancelLeftClickDrag(boolean isClientOnServer)
 	{
 		/** - Cancel Left-click + Drag */
 		if (isLeftClickDragStarted) {
 			if (leftClickHoveredSlots.size() > 1) {
-				/** - Check if client is running on a vanilla server or not */
-				if (!isVanillaServer) {
+				/** - Check if client is running on a server or not */
+				if (!isClientOnServer) {
 					/** - Return all slots to normal */
 					minecraft.player.inventory.setCursorItem(new ItemInstance(leftClickPersistentStack.itemId, leftClickItemAmount, leftClickPersistentStack.getDamage()));
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < leftClickHoveredSlots.size(); leftClickHoveredSlotsIndex++) {
@@ -775,7 +771,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 						}
 					}
 				} else {
-					/** - Return slots to normal on vanilla server */
+					/** - Return slots to normal on when client is on a server */
 					for (int leftClickHoveredSlotsIndex = 0; leftClickHoveredSlotsIndex < (leftClickHoveredSlots.size() - 1); leftClickHoveredSlotsIndex++)
 					{
 						ItemInstance cursorStack = minecraft.player.inventory.getCursorItem();
