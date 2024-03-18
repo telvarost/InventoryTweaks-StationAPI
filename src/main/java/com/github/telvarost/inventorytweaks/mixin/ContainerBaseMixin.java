@@ -124,8 +124,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				Slot clickedSlot = this.getSlot(mouseX, mouseY);
 				if (cursorStack != null) {
 					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableLeftClickDrag) {
-						// Might need to pass in isVanillaServer
-						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot);
+						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot, isVanillaServer);
 					}
 				} else {
 					exitFunction = inventoryTweaks_handleLeftClickWithoutItem(clickedSlot);
@@ -487,15 +486,20 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 		isRightClickDragStarted = false;
 	}
 
-	@Unique private boolean inventoryTweaks_handleLeftClickWithItem(ItemInstance cursorStack, Slot clickedSlot) {
+	@Unique private boolean inventoryTweaks_handleLeftClickWithItem(ItemInstance cursorStack, Slot clickedSlot, boolean isVanillaServer) {
 		/** - Ensure a slot was clicked */
 		if (null != clickedSlot) {
 
 			/** - Record how many items are in the slot and how many items are needed to fill the slot */
 			if (null != clickedSlot.getItem()) {
 
-				/** - Let vanilla minecraft handle left click with an item onto a different item */
 				if (null != cursorStack) {
+					/** - Let vanilla minecraft handle left click with an item onto any item */
+					if (isVanillaServer) {
+						return false;
+					}
+
+					/** - Let vanilla minecraft handle left click with an item onto a different item */
 					if (cursorStack.itemId != clickedSlot.getItem().itemId) {
 						return false;
 					}
