@@ -149,12 +149,14 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 			return;
 
 		if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.SCROLL_WHEEL_CONFIG.enableScrollWheelTweaks) {
-			int currentWheelDegrees = Mouse.getDWheel();
-			if (  (0 != currentWheelDegrees)
-			   && (isLeftClickDragStarted == false)
-			   && (isRightClickDragStarted == false)
-			) {
-				inventoryTweaks_handleScrollWheel(currentWheelDegrees);
+			if (!minecraft.level.isServerSide) {
+				int currentWheelDegrees = Mouse.getDWheel();
+				if ((0 != currentWheelDegrees)
+						&& (isLeftClickDragStarted == false)
+						&& (isRightClickDragStarted == false)
+				) {
+					inventoryTweaks_handleScrollWheel(currentWheelDegrees);
+				}
 			}
 		}
 

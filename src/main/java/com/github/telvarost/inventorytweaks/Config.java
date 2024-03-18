@@ -49,6 +49,7 @@ public class Config {
     public static class MouseTweaksConfig {
 
         @ConfigCategory("Scroll Wheel Config")
+        @Comment("Only works in single-player")
         public final ScrollWheelConfig SCROLL_WHEEL_CONFIG = new ScrollWheelConfig();
 
         @ConfigName("Empty cursor [Shift + Left-Click + Drag]")
@@ -69,7 +70,7 @@ public class Config {
     public static class ScrollWheelConfig {
 
         @ConfigName("Enable Scroll Wheel Tweaks")
-        @ValueOnVanillaServer(booleanValue = TriBoolean.FALSE)
+        @Comment("Does not work in multiplayer")
         public Boolean enableScrollWheelTweaks = true;
 
         @ConfigName("Invert scroll direction: cursor/slot")
