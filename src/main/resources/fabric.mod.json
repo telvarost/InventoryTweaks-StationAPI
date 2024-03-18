@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "InventoryTweaks",
-  "description": "Inventory tweaks for b1.7.3 with StationAPI. Special thanks to YaLTeR and js6pak for inspiring a lot of the concepts in this mod.",
+  "description": "Adds the modern Left-Click + Drag and Right-Click + Drag mechanics, MouseTweaks, and more to the game! Special thanks to YaLTeR and js6pak for inspiring a lot of the concepts in this mod.",
   "authors": [
     "Telvarost"
   ],
@@ -17,7 +17,7 @@
   "license": "CC0-1.0",
   "icon": "assets/inventorytweaks/icon.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "stationapi:event_bus": [
     ],
@@ -35,5 +35,9 @@
 
   "depends": {
     "minecraft": "1.0.0-beta.7.3"
+  },
+
+  "custom": {
+    "modmenu:clientsideOnly": true
   }
 }
