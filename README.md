@@ -6,7 +6,8 @@ A StationAPI mod for Minecraft Beta 1.7.3 that adds some inventory tweaks.
 
 This mod is currently incompatible with the regular version of MojangFix. If you would like to use that mod you will need the compatibility version of the mod for InventoryTweaks found here: [https://github.com/telvarost/MojangFix-StationAPI/releases](https://github.com/telvarost/MojangFix-StationAPI/releases)
 
-**There's a very high chance this mod will not work in multiplayer, as of right now it is purely for singleplayer**
+**This version of the mod now supports multiplayer!**
+* Features on multiplayer are slightly simplified to accommodate what vanilla servers are capable of.
 
 ## List of Changes:
 

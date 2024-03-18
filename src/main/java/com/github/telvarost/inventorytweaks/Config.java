@@ -1,9 +1,7 @@
 package com.github.telvarost.inventorytweaks;
 
 import blue.endless.jankson.Comment;
-import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
-import net.glasslauncher.mods.api.gcapi.api.ConfigName;
-import net.glasslauncher.mods.api.gcapi.api.GConfig;
+import net.glasslauncher.mods.api.gcapi.api.*;
 
 public class Config {
 
@@ -51,6 +49,7 @@ public class Config {
     public static class MouseTweaksConfig {
 
         @ConfigCategory("Scroll Wheel Config")
+        @Comment("Only works in single-player")
         public final ScrollWheelConfig SCROLL_WHEEL_CONFIG = new ScrollWheelConfig();
 
         @ConfigName("Empty cursor [Shift + Left-Click + Drag]")
@@ -71,6 +70,7 @@ public class Config {
     public static class ScrollWheelConfig {
 
         @ConfigName("Enable Scroll Wheel Tweaks")
+        @Comment("Does not work in multiplayer")
         public Boolean enableScrollWheelTweaks = true;
 
         @ConfigName("Invert scroll direction: cursor/slot")
