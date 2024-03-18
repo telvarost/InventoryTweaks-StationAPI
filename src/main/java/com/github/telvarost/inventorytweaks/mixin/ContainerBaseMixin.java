@@ -788,6 +788,8 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 							this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
 						}
 					}
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get((leftClickHoveredSlots.size() - 1)).id, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, leftClickHoveredSlots.get((leftClickHoveredSlots.size() - 1)).id, 0, false, this.minecraft.player);
 				}
 
 				/** - Reset Left-click + Drag variables and exit function */
