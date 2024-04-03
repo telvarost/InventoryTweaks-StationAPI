@@ -861,11 +861,15 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 
 		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.NumKeyHotbarSwap) {
 			if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9) {
-				if (this.minecraft.player.inventory.getCursorItem() == null) {
+				if (  (null != this.container.slots)
+						&& (10 <= this.container.slots.size())
+				) {
+					if (this.minecraft.player.inventory.getCursorItem() == null) {
+						this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
+					}
+					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, (this.container.slots.size() - 10) + keyCode - 1, 0, false, this.minecraft.player);
 					this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
 				}
-				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, 35 + keyCode - 1, 0, false, this.minecraft.player);
-				this.minecraft.interactionManager.clickSlot(this.container.currentContainerId, slot.id, 0, false, this.minecraft.player);
 			}
 		}
 	}
