@@ -32,12 +32,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 	@Shadow
 	protected abstract boolean isMouseOverSlot(Slot slot, int x, int Y);
 
-	@Shadow protected int containerWidth;
-
-	@Shadow protected int containerHeight;
-
-	@Unique
-	private Slot slot;
+	@Unique private Slot slot;
 
 	@Unique Slot lastRMBSlot = null;
 
@@ -373,7 +368,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				if (null != clickedSlot.getItem()) {
 
 					/** - Let vanilla minecraft handle right click with an item onto a different item */
-					if (cursorStack.itemId != clickedSlot.getItem().itemId) {
+					if ( !cursorStack.isDamageAndIDIdentical(clickedSlot.getItem()) ) {
 						return false;
 					}
 
@@ -500,7 +495,7 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 					}
 
 					/** - Let vanilla minecraft handle left click with an item onto a different item */
-					if (cursorStack.itemId != clickedSlot.getItem().itemId) {
+					if ( !cursorStack.isDamageAndIDIdentical(clickedSlot.getItem()) ) {
 						return false;
 					}
 				}
