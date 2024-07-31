@@ -3,9 +3,11 @@ package com.github.telvarost.inventorytweaks.mixin;
 import com.github.telvarost.inventorytweaks.Config;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.screen.container.ContainerBase;
+import net.minecraft.container.Crafting;
+import net.minecraft.container.Furnace;
+import net.minecraft.entity.player.PlayerContainer;
 import net.minecraft.item.ItemInstance;
 import net.minecraft.container.slot.Slot;
-import net.modificationstation.stationapi.api.network.ModdedPacketHandler;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -232,10 +234,27 @@ public abstract class ContainerBaseMixin extends ScreenBase {
 				slotStackAmount = slotItemToExamine.count;
 			}
 
+			/** - Allow transfers if one or both of the slots are empty */
 			if (  (null != cursorStack)
 			   && (null != slotItemToExamine)
 			) {
+				/** - Prevent transfers if items in slots do not match */
 				transferAllowed = cursorStack.isDamageAndIDIdentical(slotItemToExamine);
+			}
+
+			/** - Prevent illegal transfers that can cause bugs/dupes */
+			if (  (slot.id == 0) && (container instanceof Crafting)
+			   || (slot.id == 2) && (container instanceof Furnace)
+			   || (  (container instanceof PlayerContainer)
+				  && (  (slot.id == 0)
+					 ||	(slot.id == 5)
+					 ||	(slot.id == 6)
+					 ||	(slot.id == 7)
+					 ||	(slot.id == 8)
+				     )
+			      )
+			) {
+				transferAllowed = false;
 			}
 
 			if (transferAllowed) {
