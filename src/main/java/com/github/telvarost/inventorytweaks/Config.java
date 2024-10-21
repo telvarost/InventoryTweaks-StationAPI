@@ -1,99 +1,113 @@
 package com.github.telvarost.inventorytweaks;
 
 import blue.endless.jankson.Comment;
-import net.glasslauncher.mods.api.gcapi.api.*;
+import net.glasslauncher.mods.gcapi3.api.*;
 
 public class Config {
 
-    @GConfig(value = "inventoryTweaks", visibleName = "InventoryTweaks", primary = true)
+    @ConfigRoot(value = "inventoryTweaks", visibleName = "InventoryTweaks")
     public static InventoryTweaksConfig INVENTORY_TWEAKS_CONFIG = new InventoryTweaksConfig();
 
     public static class InventoryTweaksConfig {
 
-        @ConfigCategory("Modern Minecraft Config")
+        @ConfigCategory(name = "Modern Minecraft Config")
         public static final ModernMinecraftConfig MODERN_MINECRAFT_CONFIG = new ModernMinecraftConfig();
 
-        @ConfigCategory("MouseTweaks Config")
+        @ConfigCategory(name = "MouseTweaks Config")
         public static final MouseTweaksConfig MOUSE_TWEAKS_CONFIG = new MouseTweaksConfig();
     }
 
     public static class ModernMinecraftConfig {
 
-        @ConfigName("Enable [Click + Drag] graphics")
+        @ConfigEntry(name = "Enable [Click + Drag] graphics")
         public Boolean EnableDragGraphics = true;
 
-        @ConfigName("Enable [Left-Click + Drag]")
+        @ConfigEntry(name = "Enable [Left-Click + Drag]")
         public Boolean EnableLeftClickDrag = true;
 
-        @ConfigName("Enable [Right-Click + Drag]")
+        @ConfigEntry(name = "Enable [Right-Click + Drag]")
         public Boolean EnableRightClickDrag = true;
 
-        @ConfigName("Prefer [Shift-Click] over [Left-Click + Drag]")
+        @ConfigEntry(name = "Prefer [Shift-Click] over [Left-Click + Drag]")
         public Boolean LMBPreferShiftClick = true;
 
-        @ConfigName("Prefer [Shift-Click] over [Right-Click + Drag]")
+        @ConfigEntry(name = "Prefer [Shift-Click] over [Right-Click + Drag]")
         public Boolean RMBPreferShiftClick = true;
 
-        @ConfigName("Use [DROP_KEY] to drop inventory items")
-        @Comment("Cursor must not be holding any items")
+        @ConfigEntry(
+                name = "Use [DROP_KEY] to drop inventory items",
+                description = "Cursor must not be holding any items"
+        )
         public Boolean UseDropKeyInInventory = true;
 
-        @ConfigName("Use [LCtrl + DROP_KEY] to drop entire stack")
+        @ConfigEntry(name = "Use [LCtrl + DROP_KEY] to drop entire stack")
         public Boolean LCtrlStackDrop = true;
 
-        @ConfigName("Use [NUMBER_KEYS] to swap items to hotbar")
-        @Comment("Hover over the slot or swap cursor item")
+        @ConfigEntry(
+                name = "Use [NUMBER_KEYS] to swap items to hotbar",
+                description = "Hover over the slot or swap cursor item"
+        )
         public Boolean NumKeyHotbarSwap = true;
     }
 
     public static class MouseTweaksConfig {
 
-        @ConfigCategory("Scroll Wheel Config")
-        @Comment("Only works in single-player")
+        @ConfigCategory(
+                name = "Scroll Wheel Config",
+                description = "Only works in single-player"
+        )
         public final ScrollWheelConfig SCROLL_WHEEL_CONFIG = new ScrollWheelConfig();
 
-        @ConfigName("Empty cursor [Shift + Left-Click + Drag]")
-        @Comment("[Shift-Click] items of any type")
+        @ConfigEntry(
+                name = "Empty cursor [Shift + Left-Click + Drag]",
+                description = "[Shift-Click] items of any type"
+        )
         public Boolean LMBTweakShiftClickAny = true;
 
-        @ConfigName("Item in cursor [Shift + Left-Click + Drag]")
-        @Comment("[Shift-Click] items of the held type")
+        @ConfigEntry(
+                name = "Item in cursor [Shift + Left-Click + Drag]",
+                description = "[Shift-Click] items of the held type"
+        )
         public Boolean LMBTweakShiftClick = true;
 
-        @ConfigName("[Right-Click + Drag] over existing slots")
+        @ConfigEntry(name = "[Right-Click + Drag] over existing slots")
         public Boolean RMBTweak = true;
 
-        @ConfigName("[Left-Click + Drag] to pick up items")
+        @ConfigEntry(name = "[Left-Click + Drag] to pick up items")
         public Boolean LMBTweakPickUp = true;
     }
 
     public static class ScrollWheelConfig {
 
-        @ConfigName("Enable Scroll Wheel Tweaks")
-        @Comment("Does not work in multiplayer")
+        @ConfigEntry(
+                name = "Enable Scroll Wheel Tweaks",
+                description = "Does not work in multiplayer"
+        )
         public Boolean enableScrollWheelTweaks = true;
 
-        @ConfigName("Invert scroll direction: cursor/slot")
-        @Comment("For cursor/slot item transfer")
+        @ConfigEntry(
+                name = "Invert scroll direction: cursor/slot",
+                description = "For cursor/slot item transfer"
+        )
         public Boolean invertScrollCursorSlotDirection = false;
 
-//        @ConfigName("Invert scroll direction: inventories")
+//        @ConfigEntry(name = "Invert scroll direction: inventories")
 //        @Comment("For item transfer between inventories")
 //        public static Boolean invertScrollInventoryDirection = false;
 //
-//        @ConfigName("Position aware scrolling inventory transfer")
+//        @ConfigEntry(name = "Position aware scrolling inventory transfer")
 //        @Comment("Slot position will determine scroll direction")
 //        public static Boolean positionAwareScrolling = false;
 //
-//        @ConfigName("Wheel slot search order (see comment)")
+//        @ConfigEntry(name = "Wheel slot search order (see comment)")
 //        @Comment("true = first to last, false = last to first")
 //        public static Boolean wheelSearchOrder = true;
 //
-//        @ConfigName("[ScrollWheel] transfer (see comment)")
+//        @ConfigEntry(name = "[ScrollWheel] transfer (see comment)")
 //        @Comment("true = cursor/slot, false = inventories")
 //        public static Boolean scrollWheelBehavior = true;
 //
-//        @ConfigName("[Shift + ScrollWheel] transfer (see comment)")
+//        @ConfigEntry(name = "[Shift + ScrollWheel] transfer (see comment)")
 //        @Comment("true = inventories, false = cursor/slot")
 //        public static Boolean shiftScrollWheelBehavior = true;
     }
