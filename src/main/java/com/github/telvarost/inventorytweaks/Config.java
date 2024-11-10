@@ -28,6 +28,9 @@ public class Config {
         @ConfigEntry(name = "Enable [Right-Click + Drag]")
         public Boolean EnableRightClickDrag = true;
 
+        @ConfigEntry(name = "Enable [Shift-Click] crafting")
+        public Boolean EnableShiftClickCrafting = true;
+
         @ConfigEntry(name = "Prefer [Shift-Click] over [Left-Click + Drag]")
         public Boolean LMBPreferShiftClick = true;
 

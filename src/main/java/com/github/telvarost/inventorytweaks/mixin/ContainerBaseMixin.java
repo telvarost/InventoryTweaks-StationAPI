@@ -1,6 +1,7 @@
 package com.github.telvarost.inventorytweaks.mixin;
 
 import com.github.telvarost.inventorytweaks.Config;
+import net.minecraft.screen.slot.CraftingResultSlot;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,11 +26,18 @@ import static java.lang.Math.abs;
 
 @Mixin(HandledScreen.class)
 public abstract class ContainerBaseMixin extends Screen {
+
 	@Shadow
-	protected abstract Slot getSlotAt(int x, int y);
+	protected int backgroundWidth;
+
+	@Shadow
+	protected int backgroundHeight;
 
 	@Shadow
 	public net.minecraft.screen.ScreenHandler container;
+
+	@Shadow
+	protected abstract Slot getSlotAt(int x, int y);
 
 	@Shadow
 	protected abstract boolean isPointOverSlot(Slot slot, int x, int Y);
@@ -80,6 +88,16 @@ public abstract class ContainerBaseMixin extends Screen {
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		isLeftClickDragMouseTweaksStarted = false;
+
+		/** - Handle shift click crafting */
+		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickCrafting) {
+			if (inventoryTweaks_handleShiftClickCrafting(mouseX, mouseY, button)) {
+				/** - Handle if a button was clicked */
+				super.mouseClicked(mouseX, mouseY, button);
+				ci.cancel();
+				return;
+			}
+		}
 
 		/** - Check if client is on a server */
 		boolean isClientOnServer = minecraft.world.isRemote;
@@ -133,6 +151,49 @@ public abstract class ContainerBaseMixin extends Screen {
 				super.mouseClicked(mouseX, mouseY, button);
 				ci.cancel();
 				return;
+			}
+		}
+	}
+
+	@Unique private boolean inventoryTweaks_handleShiftClickCrafting(int mouseX, int mouseY, int button) {
+		Slot slot = this.getSlotAt(mouseX, mouseY);
+
+		if (slot instanceof CraftingResultSlot) {
+			boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
+			if (true == isShiftKeyDown && slot.hasStack()) {
+				for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
+					if (slot.hasStack()) {
+						inventoryTweaks_internalMouseClicked(mouseX, mouseY, button);
+					} else {
+						break;
+					}
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Unique private void inventoryTweaks_internalMouseClicked(int mouseX, int mouseY, int button) {
+		super.mouseClicked(mouseX, mouseY, button);
+		if (button == 0 || button == 1) {
+			Slot var4 = this.getSlotAt(mouseX, mouseY);
+			int var5 = (this.width - this.backgroundWidth) / 2;
+			int var6 = (this.height - this.backgroundHeight) / 2;
+			boolean var7 = mouseX < var5 || mouseY < var6 || mouseX >= var5 + this.backgroundWidth || mouseY >= var6 + this.backgroundHeight;
+			int var8 = -1;
+			if (var4 != null) {
+				var8 = var4.id;
+			}
+
+			if (var7) {
+				var8 = -999;
+			}
+
+			if (var8 != -1) {
+				boolean var9 = var8 != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
+				this.minecraft.interactionManager.clickSlot(this.container.syncId, var8, button, var9, this.minecraft.player);
 			}
 		}
 	}
