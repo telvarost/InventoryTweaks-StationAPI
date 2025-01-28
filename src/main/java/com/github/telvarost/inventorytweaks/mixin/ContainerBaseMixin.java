@@ -621,14 +621,17 @@ public abstract class ContainerBaseMixin extends Screen {
 
 		/** - Ensure a slot was clicked */
 		if (clickedSlot != null) {
+			boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
+
 			/** - Get info for MouseTweaks `Left-Click + Drag` mechanics */
-			ItemStack itemInSlot = clickedSlot.getStack();
-			leftClickMouseTweaksPersistentStack = itemInSlot;
+			if (!isShiftKeyDown) {
+				ItemStack itemInSlot = clickedSlot.getStack();
+				leftClickMouseTweaksPersistentStack = itemInSlot;
+			}
 
 			/** - Handle initial Left-click */
 			lastLMBSlotId = clickedSlot.id;
 			lastLMBSlot = clickedSlot;
-			boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 			this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
 
 			return true;

@@ -73,7 +73,7 @@ public class Config {
         public Boolean LMBTweakShiftClick = true;
 
         @ConfigEntry(name = "[Right-Click + Drag] over existing slots")
-        public Boolean RMBTweak = true;
+        public Boolean RMBTweak = false;
 
         @ConfigEntry(name = "[Left-Click + Drag] to pick up items")
         public Boolean LMBTweakPickUp = true;
