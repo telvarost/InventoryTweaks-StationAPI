@@ -22,7 +22,7 @@ This mod is incompatible with the regular version of MojangFix. If you would lik
 ### MouseTweaks Changes
 * MouseTweaks `Right-Click + Drag`
     * Very similar to the standard RMB dragging mechanic, with one difference: if you drag over a slot multiple times, an item will be put there multiple times. Replaces the standard mechanic if enabled.
-    * Disabled by default in v2.3.2+
+    * Disabled by default in v2.3.1+
 * MouseTweaks `Left-Click + Drag` (with item)
     * Lets you quickly pick up or move items of the same type.
     * Move items to another inventory if holding `Shift`
