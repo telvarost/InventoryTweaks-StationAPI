@@ -14,6 +14,18 @@ public class Config {
 
         @ConfigCategory(name = "MouseTweaks Config")
         public static final MouseTweaksConfig MOUSE_TWEAKS_CONFIG = new MouseTweaksConfig();
+
+        @ConfigEntry(
+                name = "Enable [Ctrl-Click] crafting",
+                description = "Craft a single stack of items into inventory"
+        )
+        public Boolean EnableCtrlClickCrafting = true;
+
+        @ConfigEntry(
+                name = "Enable [Right-Click] crafting",
+                description = "Craft a single stack of items"
+        )
+        public Boolean EnableRightClickCrafting = true;
     }
 
     public static class ModernMinecraftConfig {

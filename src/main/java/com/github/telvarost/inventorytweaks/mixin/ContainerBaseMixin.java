@@ -89,6 +89,26 @@ public abstract class ContainerBaseMixin extends Screen {
 	protected void inventoryTweaks_mouseClicked(int mouseX, int mouseY, int button, CallbackInfo ci) {
 		isLeftClickDragMouseTweaksStarted = false;
 
+		/** - Handle ctrl click crafting */
+		if (Config.INVENTORY_TWEAKS_CONFIG.EnableCtrlClickCrafting) {
+			if (inventoryTweaks_handleCtrlClickCrafting(mouseX, mouseY, button)) {
+				/** - Handle if a button was clicked */
+				super.mouseClicked(mouseX, mouseY, button);
+				ci.cancel();
+				return;
+			}
+		}
+
+		/** - Handle right click crafting */
+		if (Config.INVENTORY_TWEAKS_CONFIG.EnableRightClickCrafting) {
+			if (inventoryTweaks_handleRightClickCrafting(mouseX, mouseY, button)) {
+				/** - Handle if a button was clicked */
+				super.mouseClicked(mouseX, mouseY, button);
+				ci.cancel();
+				return;
+			}
+		}
+
 		/** - Handle shift click crafting */
 		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickCrafting) {
 			if (inventoryTweaks_handleShiftClickCrafting(mouseX, mouseY, button)) {
@@ -153,6 +173,53 @@ public abstract class ContainerBaseMixin extends Screen {
 				return;
 			}
 		}
+	}
+
+	@Unique private boolean inventoryTweaks_handleCtrlClickCrafting(int mouseX, int mouseY, int button) {
+		Slot slot = this.getSlotAt(mouseX, mouseY);
+
+		if (slot instanceof CraftingResultSlot) {
+			boolean isCtrlKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+			/** - Ctrl-click */
+			if (true == isCtrlKeyDown && slot.hasStack()) {
+				int maxStackSize = slot.getMaxItemCount();
+				int numCrafted = 0;
+				for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
+					if (slot.hasStack() && numCrafted < maxStackSize) {
+						numCrafted += slot.getStack().count;
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, true, this.minecraft.player);
+					} else {
+						break;
+					}
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Unique private boolean inventoryTweaks_handleRightClickCrafting(int mouseX, int mouseY, int button) {
+		Slot slot = this.getSlotAt(mouseX, mouseY);
+
+		if (slot instanceof CraftingResultSlot) {
+			/** - Right-click */
+			if (button == 1 && slot.hasStack()) {
+				int maxStackSize = slot.getMaxItemCount();
+				int numCrafted = 0;
+				for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
+					if (slot.hasStack() && numCrafted < maxStackSize) {
+						numCrafted += slot.getStack().count;
+						inventoryTweaks_internalMouseClicked(mouseX, mouseY, button);
+					} else {
+						break;
+					}
+				}
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Unique private boolean inventoryTweaks_handleShiftClickCrafting(int mouseX, int mouseY, int button) {
