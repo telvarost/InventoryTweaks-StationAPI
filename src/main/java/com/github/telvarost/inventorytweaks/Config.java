@@ -23,7 +23,7 @@ public class Config {
 
         @ConfigEntry(
                 name = "Enable [Right-Click] crafting",
-                description = "Craft a single stack of items"
+                description = "Craft a single stack of items into cursor"
         )
         public Boolean EnableRightClickCrafting = true;
     }

@@ -182,7 +182,7 @@ public abstract class ContainerBaseMixin extends Screen {
 			boolean isCtrlKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
 			/** - Ctrl-click */
 			if (true == isCtrlKeyDown && slot.hasStack()) {
-				int maxStackSize = slot.getMaxItemCount();
+				int maxStackSize = slot.getStack().getMaxCount();
 				int numCrafted = 0;
 				for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
 					if (slot.hasStack() && numCrafted < maxStackSize) {
@@ -205,17 +205,21 @@ public abstract class ContainerBaseMixin extends Screen {
 		if (slot instanceof CraftingResultSlot) {
 			/** - Right-click */
 			if (button == 1 && slot.hasStack()) {
-				int maxStackSize = slot.getMaxItemCount();
-				int numCrafted = 0;
-				for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
-					if (slot.hasStack() && numCrafted < maxStackSize) {
-						numCrafted += slot.getStack().count;
-						inventoryTweaks_internalMouseClicked(mouseX, mouseY, button);
-					} else {
-						break;
+				/** - Abort and do normal shift key crafting if shift key is down */
+				boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
+				if (!isShiftKeyDown) {
+					int maxStackSize = slot.getStack().getMaxCount();
+					int numCrafted = 0;
+					for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
+						if (slot.hasStack() && numCrafted < maxStackSize) {
+							numCrafted += slot.getStack().count;
+							inventoryTweaks_internalMouseClicked(mouseX, mouseY, button);
+						} else {
+							break;
+						}
 					}
+					return true;
 				}
-				return true;
 			}
 		}
 
