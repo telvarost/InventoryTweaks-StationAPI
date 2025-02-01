@@ -13,6 +13,11 @@ This mod is incompatible with the regular version of MojangFix. If you would lik
 
 * Note that all changes can be enabled/disabled in the config menu if you have ModMenu and GlassConfigAPI.
 
+### Crafting Result Changes
+* Adds `Ctrl-Click` crafting mechanic for quickly crafting a single stack of items into your inventory
+* Adds `Right-Click` crafting mechanic for quickly crafting a single stack of items into your cursor
+* Adds `Shift-Click` crafting mechanic for quickly crafting all resources in crafting grid into inventory
+
 ### Modern Minecraft Changes
 * Adds `Left-Click + Drag` mechanic to evenly distribute held items over empty slots/slots with the same item as in modern Minecraft.
 * Adds `Right-Click + Drag` mechanic to distribute one item from held items over empty slots/slots with the same item as in modern Minecraft.

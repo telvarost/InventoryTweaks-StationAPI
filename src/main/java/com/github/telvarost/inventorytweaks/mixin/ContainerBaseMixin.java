@@ -90,7 +90,7 @@ public abstract class ContainerBaseMixin extends Screen {
 		isLeftClickDragMouseTweaksStarted = false;
 
 		/** - Handle ctrl click crafting */
-		if (Config.INVENTORY_TWEAKS_CONFIG.EnableCtrlClickCrafting) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.CRAFTING_RESULT_CONFIG.EnableCtrlClickCrafting) {
 			if (inventoryTweaks_handleCtrlClickCrafting(mouseX, mouseY, button)) {
 				/** - Handle if a button was clicked */
 				super.mouseClicked(mouseX, mouseY, button);
@@ -100,7 +100,7 @@ public abstract class ContainerBaseMixin extends Screen {
 		}
 
 		/** - Handle right click crafting */
-		if (Config.INVENTORY_TWEAKS_CONFIG.EnableRightClickCrafting) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.CRAFTING_RESULT_CONFIG.EnableRightClickCrafting) {
 			if (inventoryTweaks_handleRightClickCrafting(mouseX, mouseY, button)) {
 				/** - Handle if a button was clicked */
 				super.mouseClicked(mouseX, mouseY, button);
@@ -110,7 +110,7 @@ public abstract class ContainerBaseMixin extends Screen {
 		}
 
 		/** - Handle shift click crafting */
-		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickCrafting) {
+		if (Config.INVENTORY_TWEAKS_CONFIG.CRAFTING_RESULT_CONFIG.EnableShiftClickCrafting) {
 			if (inventoryTweaks_handleShiftClickCrafting(mouseX, mouseY, button)) {
 				/** - Handle if a button was clicked */
 				super.mouseClicked(mouseX, mouseY, button);

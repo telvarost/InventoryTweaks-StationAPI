@@ -9,11 +9,16 @@ public class Config {
 
     public static class InventoryTweaksConfig {
 
+        @ConfigCategory(name = "Crafting Result Config")
+        public static final CraftingResultConfig CRAFTING_RESULT_CONFIG = new CraftingResultConfig();
+
         @ConfigCategory(name = "Modern Minecraft Config")
         public static final ModernMinecraftConfig MODERN_MINECRAFT_CONFIG = new ModernMinecraftConfig();
 
         @ConfigCategory(name = "MouseTweaks Config")
         public static final MouseTweaksConfig MOUSE_TWEAKS_CONFIG = new MouseTweaksConfig();
+    }
+    public static class CraftingResultConfig {
 
         @ConfigEntry(
                 name = "Enable [Ctrl-Click] crafting",
@@ -26,6 +31,12 @@ public class Config {
                 description = "Craft a single stack of items into cursor"
         )
         public Boolean EnableRightClickCrafting = true;
+
+        @ConfigEntry(
+                name = "Enable [Shift-Click] crafting",
+                description = "Crafts as many items as it can into inventory"
+        )
+        public Boolean EnableShiftClickCrafting = true;
     }
 
     public static class ModernMinecraftConfig {
@@ -38,9 +49,6 @@ public class Config {
 
         @ConfigEntry(name = "Enable [Right-Click + Drag]")
         public Boolean EnableRightClickDrag = true;
-
-        @ConfigEntry(name = "Enable [Shift-Click] crafting")
-        public Boolean EnableShiftClickCrafting = true;
 
         @ConfigEntry(name = "Prefer [Shift-Click] over [Left-Click + Drag]")
         public Boolean LMBPreferShiftClick = true;
