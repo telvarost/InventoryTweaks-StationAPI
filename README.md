@@ -17,6 +17,7 @@ This mod is incompatible with the regular version of MojangFix. If you would lik
 * Adds `Ctrl-Click` crafting mechanic for quickly crafting a single stack of items into your inventory
 * Adds `Right-Click` crafting mechanic for quickly crafting a single stack of items into your cursor
 * Adds `Shift-Click` crafting mechanic for quickly crafting all resources in crafting grid into inventory
+  * Adds ability to stop `Shift-Click` crafting when crafting result changes (default: true)
 
 ### Modern Minecraft Changes
 * Adds `Left-Click + Drag` mechanic to evenly distribute held items over empty slots/slots with the same item as in modern Minecraft.
@@ -26,13 +27,13 @@ This mod is incompatible with the regular version of MojangFix. If you would lik
 
 ### MouseTweaks Changes
 * MouseTweaks `Right-Click + Drag`
-    * Very similar to the standard RMB dragging mechanic, with one difference: if you drag over a slot multiple times, an item will be put there multiple times. Replaces the standard mechanic if enabled.
-    * Disabled by default in v2.3.1+
+  * Very similar to the standard RMB dragging mechanic, with one difference: if you drag over a slot multiple times, an item will be put there multiple times. Replaces the standard mechanic if enabled.
+  * Disabled by default in v2.3.1+
 * MouseTweaks `Left-Click + Drag` (with item)
-    * Lets you quickly pick up or move items of the same type.
-    * Move items to another inventory if holding `Shift`
+  * Lets you quickly pick up or move items of the same type.
+  * Move items to another inventory if holding `Shift`
 * MouseTweaks `Left-Click + Drag + Shift` (without item)
-    * Quickly move items into another inventory.
+  * Quickly move items into another inventory.
 * Original take on the scroll wheel
   * Scroll to move items between the cursor and the hovered slot
   * Note: MouseTweaks scroll will eventually be added as well if I can figure it out
