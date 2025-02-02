@@ -37,6 +37,12 @@ public class Config {
                 description = "Crafts as many items as it can into inventory"
         )
         public Boolean EnableShiftClickCrafting = true;
+
+        @ConfigEntry(
+                name = "Stop [Shift-Click] crafting when item changes",
+                description = "Shift crafting will craft only one item type"
+        )
+        public Boolean StopShiftClickCraftingWhenItemChanges = true;
     }
 
     public static class ModernMinecraftConfig {

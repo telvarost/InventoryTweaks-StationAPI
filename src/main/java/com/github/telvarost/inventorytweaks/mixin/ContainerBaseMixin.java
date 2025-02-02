@@ -232,11 +232,20 @@ public abstract class ContainerBaseMixin extends Screen {
 		if (slot instanceof CraftingResultSlot) {
 			boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 			if (true == isShiftKeyDown && slot.hasStack()) {
+				int itemId = slot.getStack().itemId;
 				for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
-					if (slot.hasStack()) {
-						inventoryTweaks_internalMouseClicked(mouseX, mouseY, button);
+					if (Config.INVENTORY_TWEAKS_CONFIG.CRAFTING_RESULT_CONFIG.StopShiftClickCraftingWhenItemChanges) {
+						if (slot.hasStack() && itemId == slot.getStack().itemId) {
+							inventoryTweaks_internalMouseClicked(mouseX, mouseY, button);
+						} else {
+							break;
+						}
 					} else {
-						break;
+						if (slot.hasStack()) {
+							inventoryTweaks_internalMouseClicked(mouseX, mouseY, button);
+						} else {
+							break;
+						}
 					}
 				}
 				return true;
