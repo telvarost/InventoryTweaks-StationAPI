@@ -77,8 +77,14 @@ public class Config {
         )
         public Boolean NumKeyHotbarSwap = true;
 
+        @ConfigEntry(name = "Use modern [Shift-Click] items into dispensers")
+        public Boolean EnableShiftClickingItemsIntoDispensers = true;
+
         @ConfigEntry(name = "Use modern [Shift-Click] items into furnaces")
         public Boolean EnableShiftClickingItemsIntoFurnaces = true;
+
+        @ConfigEntry(name = "Use modern [Shift-Click] items to armor slots")
+        public Boolean EnableShiftClickingItemsIntoArmorSlots = true;
     }
 
     public static class MouseTweaksConfig {
