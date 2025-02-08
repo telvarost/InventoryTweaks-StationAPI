@@ -1,7 +1,13 @@
 package com.github.telvarost.inventorytweaks.mixin;
 
 import com.github.telvarost.inventorytweaks.Config;
+import com.github.telvarost.inventorytweaks.ModHelper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
+import net.minecraft.recipe.SmeltingRecipeManager;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -25,6 +31,7 @@ import net.minecraft.screen.slot.Slot;
 
 import static java.lang.Math.abs;
 
+@Environment(EnvType.CLIENT)
 @Mixin(HandledScreen.class)
 public abstract class ContainerBaseMixin extends Screen {
 
@@ -121,51 +128,12 @@ public abstract class ContainerBaseMixin extends Screen {
 		}
 
 		/** - Handle shift click into furnace */
-		if (Config.INVENTORY_TWEAKS_CONFIG.CRAFTING_RESULT_CONFIG.EnableShiftClickCrafting) {
-			if (minecraft.currentScreen instanceof FurnaceScreen) {
-				boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
-
-				if (isShiftKeyDown) {
-					Slot slot = this.getSlotAt(mouseX, mouseY);
-
-					if (null != slot && slot.hasStack()) {
-						FurnaceScreen furnaceScreen = (FurnaceScreen) minecraft.currentScreen;
-
-						if (  (slot != ((Slot)furnaceScreen.container.slots.get(0)))
-						   && (slot != ((Slot)furnaceScreen.container.slots.get(1)))
-						   && (slot != ((Slot)furnaceScreen.container.slots.get(2)))
-						) {
-							boolean smeltSlotHasStack = false;
-
-							if (((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
-								smeltSlotHasStack = true;
-							}
-
-							ItemStack slotStack = slot.getStack();
-
-							// Check if slot stack is smeltable
-							// Check if slot stack is fuel
-
-							if (null != minecraft.player.inventory.getCursorStack()) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(0)).id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
-							} else {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(0)).id, button, false, this.minecraft.player);
-
-								if (smeltSlotHasStack) {
-									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
-								}
-							}
-
-							/** - Handle if a button was clicked */
-							super.mouseClicked(mouseX, mouseY, button);
-							ci.cancel();
-							return;
-						}
-					}
-				}
+		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoFurnaces) {
+			if (inventoryTweaks_handleShiftClickIntoFurnace(mouseX, mouseY, button)) {
+				/** - Handle if a button was clicked */
+				super.mouseClicked(mouseX, mouseY, button);
+				ci.cancel();
+				return;
 			}
 		}
 
@@ -299,6 +267,79 @@ public abstract class ContainerBaseMixin extends Screen {
 					}
 				}
 				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Unique private boolean inventoryTweaks_handleShiftClickIntoFurnace(int mouseX, int mouseY, int button) {
+		if (minecraft.currentScreen instanceof FurnaceScreen) {
+			boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
+
+			if (isShiftKeyDown) {
+				Slot slot = this.getSlotAt(mouseX, mouseY);
+
+				if (null != slot && slot.hasStack()) {
+					FurnaceScreen furnaceScreen = (FurnaceScreen) minecraft.currentScreen;
+
+					if (  (slot != ((Slot)furnaceScreen.container.slots.get(0)))
+					   && (slot != ((Slot)furnaceScreen.container.slots.get(1)))
+					   && (slot != ((Slot)furnaceScreen.container.slots.get(2)))
+					) {
+						try {
+							ItemStack slotStack = slot.getStack();
+							int shiftToSlot = -1;
+
+							if (  (FabricLoader.getInstance().isModLoaded("stationapi"))
+							   && (null != ModHelper.getResultFor(slotStack))
+							) {
+								if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
+									shiftToSlot = 0;
+								} else {
+									shiftToSlot = -2;
+								}
+							} else if (null != SmeltingRecipeManager.getInstance().craft(slotStack.getItem().id)) {
+								if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
+									shiftToSlot = 0;
+								} else {
+									shiftToSlot = -2;
+								}
+							} else {
+								FurnaceBlockEntity furnace = ((FurnaceScreenAccessor)furnaceScreen).getFurnaceBlockEntity();
+
+								if (0 < ((FurnaceBlockEntityAccessor)furnace).inventoryTweaks_getFuelTime(slotStack)) {
+									if (false == ((Slot)furnaceScreen.container.slots.get(1)).hasStack()) {
+										shiftToSlot = 1;
+									} else {
+										shiftToSlot = -2;
+									}
+								}
+							}
+
+							if (-2 == shiftToSlot) {
+								return true;
+							} else if (0 <= shiftToSlot) {
+								if (null != minecraft.player.inventory.getCursorStack()) {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
+								} else {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+
+//									if (smeltSlotHasStack) {
+//										this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
+//									}
+								}
+
+								return true;
+							}
+						} catch (Exception ex) {
+							/* Do nothing */
+						}
+					}
+				}
 			}
 		}
 

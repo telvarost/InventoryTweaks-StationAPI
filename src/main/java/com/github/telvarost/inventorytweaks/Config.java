@@ -76,6 +76,9 @@ public class Config {
                 description = "Hover over the slot or swap cursor item"
         )
         public Boolean NumKeyHotbarSwap = true;
+
+        @ConfigEntry(name = "Use modern [Shift-Click] items into furnaces")
+        public Boolean EnableShiftClickingItemsIntoFurnaces = true;
     }
 
     public static class MouseTweaksConfig {
