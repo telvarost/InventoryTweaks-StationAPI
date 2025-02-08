@@ -9,6 +9,8 @@
   ],
   "client": [
     "ContainerBaseMixin",
+    "FurnaceBlockEntityAccessor",
+    "FurnaceScreenAccessor",
     "PlayerMixin",
     "MinecraftAccessor"
   ],
