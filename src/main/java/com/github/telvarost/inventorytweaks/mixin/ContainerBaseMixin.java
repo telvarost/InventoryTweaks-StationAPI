@@ -291,28 +291,36 @@ public abstract class ContainerBaseMixin extends Screen {
 							ItemStack slotStack = slot.getStack();
 							int shiftToSlot = -1;
 
-							if (  (FabricLoader.getInstance().isModLoaded("stationapi"))
-							   && (null != ModHelper.getResultFor(slotStack))
-							) {
-								if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
-									shiftToSlot = 0;
-								} else {
-									shiftToSlot = -2;
-								}
-							} else if (null != SmeltingRecipeManager.getInstance().craft(slotStack.getItem().id)) {
-								if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
-									shiftToSlot = 0;
-								} else {
-									shiftToSlot = -2;
-								}
-							} else {
-								FurnaceBlockEntity furnace = ((FurnaceScreenAccessor)furnaceScreen).getFurnaceBlockEntity();
-
-								if (0 < ((FurnaceBlockEntityAccessor)furnace).inventoryTweaks_getFuelTime(slotStack)) {
+							if (FabricLoader.getInstance().isModLoaded("stationapi")) {
+								if (null != ModHelper.getResultFor(slotStack)) {
+									if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
+										shiftToSlot = 0;
+									} else {
+										shiftToSlot = -2;
+									}
+								} else if (0 < ModHelper.getFuelTime(slotStack)) {
 									if (false == ((Slot)furnaceScreen.container.slots.get(1)).hasStack()) {
 										shiftToSlot = 1;
 									} else {
 										shiftToSlot = -2;
+									}
+								}
+							} else {
+								if (null != SmeltingRecipeManager.getInstance().craft(slotStack.getItem().id)) {
+									if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
+										shiftToSlot = 0;
+									} else {
+										shiftToSlot = -2;
+									}
+								} else {
+									FurnaceBlockEntity furnace = ((FurnaceScreenAccessor)furnaceScreen).getFurnaceBlockEntity();
+
+									if (0 < ((FurnaceBlockEntityAccessor)furnace).inventoryTweaks_getFuelTime(slotStack)) {
+										if (false == ((Slot)furnaceScreen.container.slots.get(1)).hasStack()) {
+											shiftToSlot = 1;
+										} else {
+											shiftToSlot = -2;
+										}
 									}
 								}
 							}
