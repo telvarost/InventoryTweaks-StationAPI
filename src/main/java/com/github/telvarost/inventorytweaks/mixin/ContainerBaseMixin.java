@@ -361,6 +361,26 @@ public abstract class ContainerBaseMixin extends Screen {
 		return false;
 	}
 
+	@Unique private int canItemFitInSlot(ItemStack itemsToFit, Slot slotToCheck) {
+		ItemStack dispenserSlotStack = slotToCheck.getStack();
+
+		if (null == dispenserSlotStack) {
+			/** - Slot is open */
+			return 1;
+		} else if (itemsToFit.isItemEqual(dispenserSlotStack)) {
+			if (dispenserSlotStack.count == dispenserSlotStack.getMaxCount()) {
+				/** - Slot is taken */
+				return -1;
+			} else {
+				/** - Slot is partially empty and item matches */
+				return 0;
+			}
+		}
+
+		/** - Slot is taken */
+		return -1;
+	}
+
 	@Unique private boolean inventoryTweaks_handleShiftClickIntoFurnace(int mouseX, int mouseY, int button, Slot clickedSlot) {
 		boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 		if (isShiftKeyDown) {
@@ -378,13 +398,13 @@ public abstract class ContainerBaseMixin extends Screen {
 
 						if (FabricLoader.getInstance().isModLoaded("stationapi")) {
 							if (null != ModHelper.getResultFor(slotStack)) {
-								if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
+								if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
 									shiftToSlot = 0;
 								} else {
 									shiftToSlot = -2;
 								}
 							} else if (0 < ModHelper.getFuelTime(slotStack)) {
-								if (false == ((Slot)furnaceScreen.container.slots.get(1)).hasStack()) {
+								if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
 									shiftToSlot = 1;
 								} else {
 									shiftToSlot = -2;
@@ -392,7 +412,7 @@ public abstract class ContainerBaseMixin extends Screen {
 							}
 						} else {
 							if (null != SmeltingRecipeManager.getInstance().craft(slotStack.getItem().id)) {
-								if (false == ((Slot)furnaceScreen.container.slots.get(0)).hasStack()) {
+								if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
 									shiftToSlot = 0;
 								} else {
 									shiftToSlot = -2;
@@ -401,7 +421,7 @@ public abstract class ContainerBaseMixin extends Screen {
 								FurnaceBlockEntity furnace = ((FurnaceScreenAccessor)furnaceScreen).getFurnaceBlockEntity();
 
 								if (0 < ((FurnaceBlockEntityAccessor)furnace).inventoryTweaks_getFuelTime(slotStack)) {
-									if (false == ((Slot)furnaceScreen.container.slots.get(1)).hasStack()) {
+									if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
 										shiftToSlot = 1;
 									} else {
 										shiftToSlot = -2;
@@ -422,7 +442,7 @@ public abstract class ContainerBaseMixin extends Screen {
 								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
 
 //								if (smeltSlotHasStack) {
-//									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
+//									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
 //								}
 							}
 
@@ -436,26 +456,6 @@ public abstract class ContainerBaseMixin extends Screen {
 		}
 
 		return false;
-	}
-
-	@Unique private int canItemFitInDispenserSlot(ItemStack itemsToFit, int dispenserSlot, DispenserScreen dispenserScreen) {
-		ItemStack dispenserSlotStack = ((Slot)dispenserScreen.container.slots.get(dispenserSlot)).getStack();
-
-		if (null == dispenserSlotStack) {
-			/** - Return slot to place item in */
-			return dispenserSlot;
-		} else if (itemsToFit.isItemEqual(dispenserSlotStack)) {
-			if (dispenserSlotStack.count == dispenserSlotStack.getMaxCount()) {
-				/** - Slot is taken */
-				return -1;
-			} else {
-				/** - Slot is partially empty and item matches */
-				return -2;
-			}
-		}
-
-		/** - Slot is taken */
-		return -1;
 	}
 
 	@Unique private boolean inventoryTweaks_handleShiftClickIntoDispenser(int mouseX, int mouseY, int button, Slot clickedSlot) {
@@ -476,48 +476,63 @@ public abstract class ContainerBaseMixin extends Screen {
 				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(8)))
 				) {
 					ItemStack slotStack = clickedSlot.getStack();
-					int shiftToSlot = -1;
+					int isSlotAvailable;
 					int dispenserSlotIndex;
-					boolean slotPartiallyEmpty = false;
+					boolean itemsShifted = false;
 
 					for (dispenserSlotIndex = 0; dispenserSlotIndex < 9; dispenserSlotIndex++) {
-						if (-1 == shiftToSlot) {
-							shiftToSlot = canItemFitInDispenserSlot(slotStack, dispenserSlotIndex, dispenserScreen);
+						isSlotAvailable = canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)));
 
-							if (-2 == shiftToSlot) {
-								shiftToSlot = dispenserSlotIndex;
-								slotPartiallyEmpty = true;
-
-								// Still need to handle the case where the cursor has more items and the dispenser has more available slots
+						if (0 == isSlotAvailable) {
+							/** - Partially full item slot of matching item found. */
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)).id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							itemsShifted = true;
+							if (false == clickedSlot.hasStack()) {
+								break;
 							}
+						} else if (1 == isSlotAvailable) {
+							/** - Empty slot found! */
+							if (null != minecraft.player.inventory.getCursorStack()) {
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)).id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							} else {
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)).id, button, false, this.minecraft.player);
+							}
+							itemsShifted = true;
+							break;
 						}
 					}
 
-					if (0 <= shiftToSlot) {
-						if (null != minecraft.player.inventory.getCursorStack()) {
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-						} else {
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
-
-							if (slotPartiallyEmpty) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
-							}
-						}
-
+					if (itemsShifted) {
 						return true;
 					}
 				} else {
+					ItemStack slotStack = clickedSlot.getStack();
 					int playerInventorySlotIndex;
+					int shiftToSlot;
+					int isSlotAvailable;
+					boolean itemsShifted = false;
 
 					/** - Shift item back into player inventory */
 					for (playerInventorySlotIndex = 0; playerInventorySlotIndex < (dispenserScreen.container.slots.size() - 9); playerInventorySlotIndex++) {
-						int shiftToSlot = (dispenserScreen.container.slots.size() - playerInventorySlotIndex) - 1;
+						shiftToSlot = (dispenserScreen.container.slots.size() - playerInventorySlotIndex) - 1;
+						isSlotAvailable = canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)));
 
-						// Still need to handle matching items and partially filled slots
-						if (false == ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).hasStack()) {
+						if (0 == isSlotAvailable) {
+							/** - Partially full item slot of matching item found. */
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							itemsShifted = true;
+							if (false == clickedSlot.hasStack()) {
+								break;
+							}
+						} else if (1 == isSlotAvailable) {
+							/** - Empty slot found! */
 							if (null != minecraft.player.inventory.getCursorStack()) {
 								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
 								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
@@ -525,14 +540,14 @@ public abstract class ContainerBaseMixin extends Screen {
 							} else {
 								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
 								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
-
-//								if (slotPartiallyEmpty) {
-//									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
-//								}
 							}
-
-							return true;
+							itemsShifted = true;
+							break;
 						}
+					}
+
+					if (itemsShifted) {
+						return true;
 					}
 				}
 			}
