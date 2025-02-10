@@ -19,23 +19,27 @@ public class ModHelperCrates {
 
             if (null != clickedSlot && clickedSlot.hasStack()) {
                 GuiCrate crateScreen = (GuiCrate) minecraft.currentScreen;
+                int totalInventorySize = crateScreen.container.slots.size();
 
-                if ((clickedSlot != ((Slot) crateScreen.container.slots.get(0)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(1)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(2)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(3)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(4)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(5)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(6)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(7)))
-                && (clickedSlot != ((Slot) crateScreen.container.slots.get(8)))
+                if (  (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 12)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 11)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 10)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 9)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 8)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 7)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 6)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 5)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 4)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 3)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 2)))
+                   && (clickedSlot != ((Slot) crateScreen.container.slots.get(totalInventorySize - 1)))
                 ) {
                     ItemStack slotStack = clickedSlot.getStack();
                     int isSlotAvailable;
                     int dispenserSlotIndex;
                     boolean itemsShifted = false;
 
-                    for (dispenserSlotIndex = 0; dispenserSlotIndex < 9; dispenserSlotIndex++) {
+                    for (dispenserSlotIndex = (totalInventorySize - 12); dispenserSlotIndex < totalInventorySize; dispenserSlotIndex++) {
                         isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) crateScreen.container.slots.get(dispenserSlotIndex)));
 
                         if (0 == isSlotAvailable) {
@@ -73,8 +77,8 @@ public class ModHelperCrates {
                     boolean itemsShifted = false;
 
                     /** - Shift item back into player inventory */
-                    for (playerInventorySlotIndex = 0; playerInventorySlotIndex < (crateScreen.container.slots.size() - 9); playerInventorySlotIndex++) {
-                        shiftToSlot = (crateScreen.container.slots.size() - playerInventorySlotIndex) - 1;
+                    for (playerInventorySlotIndex = 0; playerInventorySlotIndex < (totalInventorySize - 12); playerInventorySlotIndex++) {
+                        shiftToSlot = ((totalInventorySize - 12) - playerInventorySlotIndex) - 1;
                         isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) crateScreen.container.slots.get(shiftToSlot)));
 
                         if (0 == isSlotAvailable) {
