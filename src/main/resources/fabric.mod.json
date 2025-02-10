@@ -19,6 +19,9 @@
 
   "environment": "client",
   "entrypoints": {
+    "main": [
+      "com.github.telvarost.inventorytweaks.ModHelper"
+    ],
     "gcapi3": [
       "com.github.telvarost.inventorytweaks.Config"
     ]

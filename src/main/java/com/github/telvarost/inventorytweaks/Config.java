@@ -77,6 +77,12 @@ public class Config {
         )
         public Boolean NumKeyHotbarSwap = true;
 
+        @ConfigEntry(
+                name = "Use modern [Shift-Click] items into crates",
+                description = "Only works if crates mod is loaded."
+        )
+        public Boolean EnableShiftClickingItemsIntoCrates = true;
+
         @ConfigEntry(name = "Use modern [Shift-Click] items into dispensers")
         public Boolean EnableShiftClickingItemsIntoDispensers = true;
 

@@ -2,6 +2,8 @@ package com.github.telvarost.inventorytweaks.mixin;
 
 import com.github.telvarost.inventorytweaks.Config;
 import com.github.telvarost.inventorytweaks.ModHelper;
+import com.github.telvarost.inventorytweaks.ModHelperCrates;
+import com.github.telvarost.inventorytweaks.ModHelperStationAPI;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -160,6 +162,16 @@ public abstract class ContainerBaseMixin extends Screen {
 			/** - Handle shift click into dispenser */
 			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoDispensers) {
 				if (inventoryTweaks_handleShiftClickIntoDispenser(mouseX, mouseY, button, clickedSlot)) {
+					/** - Handle if a button was clicked */
+					super.mouseClicked(mouseX, mouseY, button);
+					ci.cancel();
+					return;
+				}
+			}
+		} else if (ModHelper.isCratesModLoaded && ModHelperCrates.isCratesScreen(minecraft.currentScreen)) {
+			/** - Handle shift click into crate */
+			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoCrates) {
+				if (ModHelperCrates.inventoryTweaks_handleShiftClickIntoCrate(button, clickedSlot, minecraft)) {
 					/** - Handle if a button was clicked */
 					super.mouseClicked(mouseX, mouseY, button);
 					ci.cancel();
@@ -361,26 +373,6 @@ public abstract class ContainerBaseMixin extends Screen {
 		return false;
 	}
 
-	@Unique private int canItemFitInSlot(ItemStack itemsToFit, Slot slotToCheck) {
-		ItemStack dispenserSlotStack = slotToCheck.getStack();
-
-		if (null == dispenserSlotStack) {
-			/** - Slot is open */
-			return 1;
-		} else if (itemsToFit.isItemEqual(dispenserSlotStack)) {
-			if (dispenserSlotStack.count == dispenserSlotStack.getMaxCount()) {
-				/** - Slot is taken */
-				return -1;
-			} else {
-				/** - Slot is partially empty and item matches */
-				return 0;
-			}
-		}
-
-		/** - Slot is taken */
-		return -1;
-	}
-
 	@Unique private boolean inventoryTweaks_handleShiftClickIntoFurnace(int mouseX, int mouseY, int button, Slot clickedSlot) {
 		boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 		if (isShiftKeyDown) {
@@ -397,14 +389,14 @@ public abstract class ContainerBaseMixin extends Screen {
 						int shiftToSlot = -1;
 
 						if (FabricLoader.getInstance().isModLoaded("stationapi")) {
-							if (null != ModHelper.getResultFor(slotStack)) {
-								if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
+							if (null != ModHelperStationAPI.getResultFor(slotStack)) {
+								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
 									shiftToSlot = 0;
 								} else {
 									shiftToSlot = -2;
 								}
-							} else if (0 < ModHelper.getFuelTime(slotStack)) {
-								if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
+							} else if (0 < ModHelperStationAPI.getFuelTime(slotStack)) {
+								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
 									shiftToSlot = 1;
 								} else {
 									shiftToSlot = -2;
@@ -412,7 +404,7 @@ public abstract class ContainerBaseMixin extends Screen {
 							}
 						} else {
 							if (null != SmeltingRecipeManager.getInstance().craft(slotStack.getItem().id)) {
-								if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
+								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
 									shiftToSlot = 0;
 								} else {
 									shiftToSlot = -2;
@@ -421,7 +413,7 @@ public abstract class ContainerBaseMixin extends Screen {
 								FurnaceBlockEntity furnace = ((FurnaceScreenAccessor)furnaceScreen).getFurnaceBlockEntity();
 
 								if (0 < ((FurnaceBlockEntityAccessor)furnace).inventoryTweaks_getFuelTime(slotStack)) {
-									if (0 <= canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
+									if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
 										shiftToSlot = 1;
 									} else {
 										shiftToSlot = -2;
@@ -481,7 +473,7 @@ public abstract class ContainerBaseMixin extends Screen {
 					boolean itemsShifted = false;
 
 					for (dispenserSlotIndex = 0; dispenserSlotIndex < 9; dispenserSlotIndex++) {
-						isSlotAvailable = canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)));
+						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)));
 
 						if (0 == isSlotAvailable) {
 							/** - Partially full item slot of matching item found. */
@@ -520,7 +512,7 @@ public abstract class ContainerBaseMixin extends Screen {
 					/** - Shift item back into player inventory */
 					for (playerInventorySlotIndex = 0; playerInventorySlotIndex < (dispenserScreen.container.slots.size() - 9); playerInventorySlotIndex++) {
 						shiftToSlot = (dispenserScreen.container.slots.size() - playerInventorySlotIndex) - 1;
-						isSlotAvailable = canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)));
+						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)));
 
 						if (0 == isSlotAvailable) {
 							/** - Partially full item slot of matching item found. */
