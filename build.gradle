@@ -117,7 +117,9 @@ dependencies {
 		transitive false
 	}
 
-	modCompileOnlyApi files("lib/crates-1.3.0.jar")
+//	modRuntimeOnly ("maven.modrinth:crate:${project.crates_version}") {
+//		transitive false
+//	}
 }
 
 processResources {

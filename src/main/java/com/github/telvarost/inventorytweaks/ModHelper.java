@@ -13,14 +13,28 @@ public class ModHelper implements ModInitializer {
         isCratesModLoaded = FabricLoader.getInstance().isModLoaded("crate");
     }
 
-    public static int canItemFitInSlot(ItemStack itemsToFit, Slot slotToCheck) {
-        ItemStack dispenserSlotStack = slotToCheck.getStack();
+    public static boolean isItemInSlot(ItemStack itemStack, Slot slotToCheck) {
+        ItemStack slotStack = slotToCheck.getStack();
 
-        if (null == dispenserSlotStack) {
+        if (null == slotStack) {
+            /** - Slot does not have item */
+            return false;
+        } else if (itemStack.isItemEqual(slotStack)) {
+            return true;
+        }
+
+        /** - Slot does not have item */
+        return false;
+    }
+
+    public static int canItemFitInSlot(ItemStack itemStack, Slot slotToCheck) {
+        ItemStack slotStack = slotToCheck.getStack();
+
+        if (null == slotStack) {
             /** - Slot is open */
             return 1;
-        } else if (itemsToFit.isItemEqual(dispenserSlotStack)) {
-            if (dispenserSlotStack.count == dispenserSlotStack.getMaxCount()) {
+        } else if (itemStack.isItemEqual(slotStack)) {
+            if (slotStack.count == slotStack.getMaxCount()) {
                 /** - Slot is taken */
                 return -1;
             } else {
