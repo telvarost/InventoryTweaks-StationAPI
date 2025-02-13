@@ -47,6 +47,27 @@ public class Config {
 
     public static class ModernMinecraftConfig {
 
+        @ConfigEntry(name = "Allow [Shift-Clicking] items into armor slots")
+        public Boolean EnableShiftClickingItemsIntoArmorSlots = true;
+
+        @ConfigEntry(name = "Allow [Shift-Clicking] items into dispensers")
+        public Boolean EnableShiftClickingItemsIntoDispensers = true;
+
+        @ConfigEntry(name = "Allow [Shift-Clicking] items into furnaces")
+        public Boolean EnableShiftClickingItemsIntoFurnaces = true;
+
+//        @ConfigEntry(
+//                name = "Allow [Shift-Clicking] items into mod crates",
+//                description = "Requires crates mod by Slainlight"
+//        )
+//        public Boolean EnableShiftClickingItemsIntoCrates = true;
+
+        @ConfigEntry(
+                name = "Double [Left-Click] Fill Cursor Stack",
+                description = "Initially empty cursor double click to pickup"
+        )
+        public Boolean DoubleLeftClickItemPickup = true;
+
         @ConfigEntry(name = "Enable [Click + Drag] graphics")
         public Boolean EnableDragGraphics = true;
 
@@ -76,9 +97,6 @@ public class Config {
                 description = "Hover over the slot or swap cursor item"
         )
         public Boolean NumKeyHotbarSwap = true;
-
-        @ConfigEntry(name = "Use modern [Shift-Click] items into furnaces")
-        public Boolean EnableShiftClickingItemsIntoFurnaces = true;
     }
 
     public static class MouseTweaksConfig {

@@ -116,6 +116,10 @@ dependencies {
 	modRuntimeOnly ("maven.modrinth:fast-stapi-intro:${project.stapi_fast_intro_version}") {
 		transitive false
 	}
+
+//	modRuntimeOnly ("maven.modrinth:crate:${project.crates_version}") {
+//		transitive false
+//	}
 }
 
 processResources {
