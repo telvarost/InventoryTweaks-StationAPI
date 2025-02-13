@@ -219,10 +219,10 @@ public abstract class ContainerBaseMixin extends Screen {
 				/** - Handle Left-click */
 				ItemStack cursorStack = minecraft.player.inventory.getCursorStack();
 				if (cursorStack != null) {
-					if (null != clickedSlot && false == clickedSlot.hasStack()) {
-						if (null != minecraft.world) {
+					/** - Check for double left-click fill cursor stack (checking for second click close to time of first click) */
+					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.DoubleLeftClickItemPickup) {
+						if (null != clickedSlot && false == clickedSlot.hasStack() && null != minecraft.world) {
 							if (5 > (minecraft.world.getTime() - currentTime)) {
-								System.out.println("Time diff: " + (minecraft.world.getTime() - currentTime));
 								if (inventoryTweaks_handleDoubleClickEmptyCursor(mouseX, mouseY, button, clickedSlot)) {
 									/** - Handle if a button was clicked */
 									super.mouseClicked(mouseX, mouseY, button);
@@ -237,8 +237,9 @@ public abstract class ContainerBaseMixin extends Screen {
 						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot, isClientOnServer);
 					}
 				} else {
-					if (null != clickedSlot && clickedSlot.hasStack()) {
-						if (null != minecraft.world) {
+					/** - Begin double left-click fill cursor stack (first click registered) */
+					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.DoubleLeftClickItemPickup) {
+						if (null != clickedSlot && clickedSlot.hasStack() && null != minecraft.world) {
 							currentTime = minecraft.world.getTime();
 						}
 					}
@@ -256,16 +257,6 @@ public abstract class ContainerBaseMixin extends Screen {
 				return;
 			}
 		}
-
-//		/** - Middle-click */
-//		if (button == 2) {
-//			if (inventoryTweaks_handleDoubleClickEmptyCursor(mouseX, mouseY, button, clickedSlot)) {
-//				/** - Handle if a button was clicked */
-//				super.mouseClicked(mouseX, mouseY, button);
-//				ci.cancel();
-//				return;
-//			}
-//		}
 	}
 
 	@Unique private boolean inventoryTweaks_handleCtrlClickCrafting(int mouseX, int mouseY, int button, Slot clickedSlot) {
@@ -465,10 +456,9 @@ public abstract class ContainerBaseMixin extends Screen {
 							} else {
 								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
 								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
-
-//								if (smeltSlotHasStack) {
-//									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-//								}
+								if (null != minecraft.player.inventory.getCursorStack()) {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								}
 							}
 
 							return true;
@@ -583,57 +573,46 @@ public abstract class ContainerBaseMixin extends Screen {
 
 
 	@Unique private boolean inventoryTweaks_handleDoubleClickEmptyCursor(int mouseX, int mouseY, int button, Slot clickedSlot) {
-		boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
-		if (true) {//null == minecraft.player.inventory.getCursorStack()) {//!isShiftKeyDown) {
+		if (null != clickedSlot) {
+			HandledScreen handledScreen = (HandledScreen) minecraft.currentScreen;
 
-			if (null != clickedSlot) {
-				HandledScreen handledScreen = (HandledScreen) minecraft.currentScreen;
+			ItemStack slotStack = minecraft.player.inventory.getCursorStack();
+			int playerInventorySlotIndex;
+			System.out.println("B: " + minecraft.player.inventory.getCursorStack());
 
-				ItemStack slotStack = minecraft.player.inventory.getCursorStack();//clickedSlot.getStack();
-				int playerInventorySlotIndex;
-				int shiftToSlot;
-				boolean itemsShifted = false;
-				//this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+			/** - Shift item back into player inventory */
+			for (playerInventorySlotIndex = 0; playerInventorySlotIndex < handledScreen.container.slots.size(); playerInventorySlotIndex++) {
 
-				/** - Shift item back into player inventory */
-				for (playerInventorySlotIndex = 0; playerInventorySlotIndex < handledScreen.container.slots.size(); playerInventorySlotIndex++) {
-					shiftToSlot = playerInventorySlotIndex;
+				if (ModHelper.isItemInSlot(slotStack, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)))) {
+					this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
 
-					if (ModHelper.isItemInSlot(slotStack, ((Slot)handledScreen.container.slots.get(shiftToSlot)))) {
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(shiftToSlot)).id, 0, false, this.minecraft.player);
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(shiftToSlot)).id, 0, false, this.minecraft.player);
-						itemsShifted = true;
-
-						ItemStack itemStack = ((Slot)handledScreen.container.slots.get(shiftToSlot)).getStack();
-						if (  null != itemStack
-						   && itemStack.getItem().getMaxCount() == itemStack.count
-						) {
-							/** - Stack is full */
-							itemsShifted = true;
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(shiftToSlot)).id, 0, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(shiftToSlot)).id, 0, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
-							break;
-						}
-					}
-
-					ItemStack cursorStack = minecraft.player.inventory.getCursorStack();
-					if (  null != cursorStack
-					   && cursorStack.getItem().getMaxCount() == cursorStack.count
+					ItemStack itemStack = ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).getStack();
+					if (  null != itemStack
+					   && itemStack.getItem().getMaxCount() == itemStack.count
 					) {
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+
 						/** - Stack is full */
-						itemsShifted = true;
-						//this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
 						break;
 					}
 				}
 
-				if (itemsShifted) {
-					return true;
+				ItemStack cursorStack = minecraft.player.inventory.getCursorStack();
+				if (  null != cursorStack
+				   && cursorStack.getItem().getMaxCount() == cursorStack.count
+				) {
+					/** - Stack is full */
+					break;
 				}
 			}
+
+			/** - Still pick up the item even if no items are shifted */
+			return true;
 		}
 
 		return false;
