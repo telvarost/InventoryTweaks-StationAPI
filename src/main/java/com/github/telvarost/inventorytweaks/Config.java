@@ -56,11 +56,11 @@ public class Config {
         @ConfigEntry(name = "Allow [Shift-Clicking] items into furnaces")
         public Boolean EnableShiftClickingItemsIntoFurnaces = true;
 
-//        @ConfigEntry(
-//                name = "Allow [Shift-Clicking] items into mod crates",
-//                description = "Requires crates mod by Slainlight"
-//        )
-//        public Boolean EnableShiftClickingItemsIntoCrates = true;
+        @ConfigEntry(
+                name = "Allow [Shift-Clicking] items into mod crates",
+                description = "Requires crates mod by Slainlight"
+        )
+        public Boolean EnableShiftClickingItemsIntoCrates = true;
 
         @ConfigEntry(
                 name = "Double [Left-Click] Fill Cursor Stack",

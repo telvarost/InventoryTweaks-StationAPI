@@ -2,7 +2,7 @@ package com.github.telvarost.inventorytweaks.mixin;
 
 import com.github.telvarost.inventorytweaks.Config;
 import com.github.telvarost.inventorytweaks.ModHelper;
-//import com.github.telvarost.inventorytweaks.ModHelperCrates;
+import com.github.telvarost.inventorytweaks.ModHelperCrates;
 import com.github.telvarost.inventorytweaks.ModHelperStationAPI;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -170,18 +170,17 @@ public abstract class ContainerBaseMixin extends Screen {
 					return;
 				}
 			}
+		} else if (ModHelper.isCratesModLoaded && ModHelperCrates.isCratesScreen(minecraft.currentScreen)) {
+			/** - Handle shift click into crate */
+			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoCrates) {
+				if (ModHelperCrates.inventoryTweaks_handleShiftClickIntoCrate(button, clickedSlot, minecraft)) {
+					/** - Handle if a button was clicked */
+					super.mouseClicked(mouseX, mouseY, button);
+					ci.cancel();
+					return;
+				}
+			}
 		}
-//		else if (ModHelper.isCratesModLoaded && ModHelperCrates.isCratesScreen(minecraft.currentScreen)) {
-//			/** - Handle shift click into crate */
-//			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoCrates) {
-//				if (ModHelperCrates.inventoryTweaks_handleShiftClickIntoCrate(button, clickedSlot, minecraft)) {
-//					/** - Handle if a button was clicked */
-//					super.mouseClicked(mouseX, mouseY, button);
-//					ci.cancel();
-//					return;
-//				}
-//			}
-//		}
 
 		/** - Check if client is on a server */
 		boolean isClientOnServer = minecraft.world.isRemote;
