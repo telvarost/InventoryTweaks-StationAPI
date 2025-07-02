@@ -1,9 +1,6 @@
 package com.github.telvarost.inventorytweaks.mixin;
 
-import com.github.telvarost.inventorytweaks.Config;
-import com.github.telvarost.inventorytweaks.ModHelper;
-import com.github.telvarost.inventorytweaks.ModHelperCrates;
-import com.github.telvarost.inventorytweaks.ModHelperStationAPI;
+import com.github.telvarost.inventorytweaks.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -1379,6 +1376,10 @@ public abstract class ContainerBaseMixin extends Screen {
 		}
 
 		if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.NumKeyHotbarSwap) {
+			if (ModHelper.isUniTweaksModLoaded) {
+				keyCode = ModHelperUniTweaks.remapKeyCodes(keyCode);
+			}
+
 			if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9) {
 				if (  (null != this.container.slots)
 				   && (10 <= this.container.slots.size())

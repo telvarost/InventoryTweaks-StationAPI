@@ -120,6 +120,10 @@ dependencies {
 	modRuntimeOnly ("maven.modrinth:fast-stapi-intro:${project.stapi_fast_intro_version}") {
 		transitive false
 	}
+
+	modImplementation ("maven.modrinth:unitweaks:0.20.0") {
+		transitive false
+	}
 }
 
 processResources {

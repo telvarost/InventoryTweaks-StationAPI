@@ -7,10 +7,12 @@ import net.minecraft.screen.slot.Slot;
 
 public class ModHelper implements ModInitializer {
     public static boolean isCratesModLoaded = false;
+    public static boolean isUniTweaksModLoaded = false;
 
     @Override
     public void onInitialize() {
         isCratesModLoaded = FabricLoader.getInstance().isModLoaded("crate");
+        isUniTweaksModLoaded = FabricLoader.getInstance().isModLoaded("unitweaks");
     }
 
     public static boolean isItemInSlot(ItemStack itemStack, Slot slotToCheck) {

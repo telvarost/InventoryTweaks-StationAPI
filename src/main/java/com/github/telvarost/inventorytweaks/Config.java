@@ -18,6 +18,7 @@ public class Config {
         @ConfigCategory(name = "MouseTweaks Config")
         public static final MouseTweaksConfig MOUSE_TWEAKS_CONFIG = new MouseTweaksConfig();
     }
+
     public static class CraftingResultConfig {
 
         @ConfigEntry(
