@@ -69,6 +69,12 @@ public class Config {
         )
         public Boolean DoubleLeftClickItemPickup = true;
 
+        @ConfigEntry(
+                name = "Double [Shift + Left-Click] Move Items",
+                description = "Use cursor with an item to shift inventories"
+        )
+        public Boolean DoubleLeftClickWithItemShiftInventories = true;
+
         @ConfigEntry(name = "Enable [Click + Drag] graphics")
         public Boolean EnableDragGraphics = true;
 

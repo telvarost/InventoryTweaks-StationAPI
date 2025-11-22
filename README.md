@@ -34,10 +34,10 @@ This mod is incompatible with the regular version of MojangFix. If you would lik
 * MouseTweaks `Right-Click + Drag`
   * Very similar to the standard RMB dragging mechanic, with one difference: if you drag over a slot multiple times, an item will be put there multiple times. Replaces the standard mechanic if enabled.
   * Disabled by default in v2.3.1+
-* MouseTweaks `Left-Click + Drag` (with item)
+* MouseTweaks `Left-Click + Drag` (with item) // broken for dispensers
   * Lets you quickly pick up or move items of the same type.
   * Move items to another inventory if holding `Shift`
-* MouseTweaks `Left-Click + Drag + Shift` (without item)
+* MouseTweaks `Left-Click + Drag + Shift` (without item) // broken for dispensers
   * Quickly move items into another inventory.
 * Original take on the scroll wheel
   * Scroll to move items between the cursor and the hovered slot

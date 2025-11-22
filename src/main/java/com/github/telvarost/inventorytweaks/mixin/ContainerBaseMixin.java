@@ -6,9 +6,8 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.FurnaceBlockEntity;
-import net.minecraft.client.gui.screen.ingame.DispenserScreen;
-import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.recipe.SmeltingRecipeManager;
 import net.minecraft.screen.slot.CraftingResultSlot;
@@ -25,7 +24,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.FurnaceScreenHandler;
@@ -53,7 +51,9 @@ public abstract class ContainerBaseMixin extends Screen {
 	@Shadow
 	protected abstract boolean isPointOverSlot(Slot slot, int x, int Y);
 
-	@Unique long currentTime;
+	@Unique long lastEmptyLeftClickTime;
+
+	@Unique long lastLeftClickWithItemTime;
 
 	@Unique private Slot slot;
 
@@ -70,6 +70,9 @@ public abstract class ContainerBaseMixin extends Screen {
 
 	@Unique
 	private ItemStack leftClickPersistentStack = null;
+
+	@Unique
+	private ItemStack leftClickPersistentStackShiftInventories = null;
 
 	@Unique
 	private ItemStack rightClickPersistentStack = null;
@@ -136,7 +139,7 @@ public abstract class ContainerBaseMixin extends Screen {
 			}
 		}
 
-		/** - Check special click behavior for current screen */
+		/** - Check special click behavior for current screen (part 1 - special screens) */
 		if (minecraft.currentScreen instanceof InventoryScreen) {
 			/** - Handle shift click into armor slots */
 			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoArmorSlots) {
@@ -157,27 +160,9 @@ public abstract class ContainerBaseMixin extends Screen {
 					return;
 				}
 			}
-		} else if (minecraft.currentScreen instanceof DispenserScreen) {
-			/** - Handle shift click into dispenser */
-			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoDispensers) {
-				if (inventoryTweaks_handleShiftClickIntoDispenser(mouseX, mouseY, button, clickedSlot)) {
-					/** - Handle if a button was clicked */
-					super.mouseClicked(mouseX, mouseY, button);
-					ci.cancel();
-					return;
-				}
-			}
-		} else if (ModHelper.isCratesModLoaded && ModHelperCrates.isCratesScreen(minecraft.currentScreen)) {
-			/** - Handle shift click into crate */
-			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoCrates) {
-				if (ModHelperCrates.inventoryTweaks_handleShiftClickIntoCrate(button, clickedSlot, minecraft)) {
-					/** - Handle if a button was clicked */
-					super.mouseClicked(mouseX, mouseY, button);
-					ci.cancel();
-					return;
-				}
-			}
 		}
+
+		System.out.println("Click: " + button);
 
 		/** - Check if client is on a server */
 		boolean isClientOnServer = minecraft.world.isRemote;
@@ -218,7 +203,7 @@ public abstract class ContainerBaseMixin extends Screen {
 					/** - Check for double left-click fill cursor stack (checking for second click close to time of first click) */
 					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.DoubleLeftClickItemPickup) {
 						if (null != clickedSlot && false == clickedSlot.hasStack() && null != minecraft.world) {
-							if (5 > (minecraft.world.getTime() - currentTime)) {
+							if (5 > (minecraft.world.getTime() - lastEmptyLeftClickTime)) {
 								if (inventoryTweaks_handleDoubleClickEmptyCursor(mouseX, mouseY, button, clickedSlot)) {
 									/** - Handle if a button was clicked */
 									super.mouseClicked(mouseX, mouseY, button);
@@ -229,18 +214,48 @@ public abstract class ContainerBaseMixin extends Screen {
 						}
 					}
 
+//					/** - Check for double shift + left-click move inventories (checking for second click close to time of first click) */
+//					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.DoubleLeftClickWithItemShiftInventories) {
+//						if (null != clickedSlot && false == clickedSlot.hasStack() && null != minecraft.world) {
+//							if (5 > (minecraft.world.getTime() - lastLeftClickWithItemTime)) {
+//								if (inventoryTweaks_handleDoubleClickWithItem(mouseX, mouseY, button, clickedSlot)) {
+//									/** - Handle if a button was clicked */
+//									super.mouseClicked(mouseX, mouseY, button);
+//									ci.cancel();
+//									return;
+//								}
+//							}
+//						}
+//					}
+//
+//					/** - Begin double shift + left-click move inventories (first click registered) */
+//					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.DoubleLeftClickWithItemShiftInventories) {
+//						boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
+//						if (isShiftKeyDown) {
+//							if (null != clickedSlot && clickedSlot.hasStack() && null != minecraft.world) {
+//								lastLeftClickWithItemTime = minecraft.world.getTime();
+//								leftClickPersistentStackShiftInventories = clickedSlot.getStack();
+//								System.out.println("Here doof3: " + lastLMBSlotId);
+////								/** - Handle if a button was clicked */
+////								super.mouseClicked(mouseX, mouseY, button);
+////								ci.cancel();
+////								return;
+//							}
+//						}
+//					}
+
 					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableLeftClickDrag) {
-						exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot, isClientOnServer);
+						//exitFunction = inventoryTweaks_handleLeftClickWithItem(cursorStack, clickedSlot, isClientOnServer);
 					}
 				} else {
 					/** - Begin double left-click fill cursor stack (first click registered) */
 					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.DoubleLeftClickItemPickup) {
 						if (null != clickedSlot && clickedSlot.hasStack() && null != minecraft.world) {
-							currentTime = minecraft.world.getTime();
+							lastEmptyLeftClickTime = minecraft.world.getTime();
 						}
 					}
 
-					exitFunction = inventoryTweaks_handleLeftClickWithoutItem(clickedSlot);
+					//exitFunction = inventoryTweaks_handleLeftClickWithoutItem(clickedSlot);
 				}
 			} else {
 				exitFunction = true;
@@ -251,6 +266,31 @@ public abstract class ContainerBaseMixin extends Screen {
 				super.mouseClicked(mouseX, mouseY, button);
 				ci.cancel();
 				return;
+			}
+		}
+
+		/** - Check special click behavior for current screen (part 2 - containers) */
+		if (minecraft.currentScreen instanceof DispenserScreen) {
+			/** - Handle shift click into dispenser */
+			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoDispensers) {
+				System.out.println("Try SHIFIFO");
+				if (inventoryTweaks_handleShiftClickIntoDispenser(mouseX, mouseY, button, clickedSlot)) {
+					/** - Handle if a button was clicked */
+					super.mouseClicked(mouseX, mouseY, button);
+					ci.cancel();
+					return;
+				}
+			}
+		} else if (ModHelper.isCratesModLoaded && ModHelperCrates.isCratesScreen(minecraft.currentScreen)) {
+			/* todo: need to fix this and other special shift click scenarios */
+			/** - Handle shift click into crate */
+			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoCrates) {
+				if (ModHelperCrates.inventoryTweaks_handleShiftClickIntoCrate(button, clickedSlot, minecraft)) {
+					/** - Handle if a button was clicked */
+					super.mouseClicked(mouseX, mouseY, button);
+					ci.cancel();
+					return;
+				}
 			}
 		}
 	}
@@ -469,31 +509,164 @@ public abstract class ContainerBaseMixin extends Screen {
 		return false;
 	}
 
+	@Unique public ItemStack clickSlotInternal(int syncId, int slotId, int button, boolean shift, PlayerEntity player, Slot clickedSlot) {
+		ItemStack itemStack = null;
+
+		if (  shift
+		   && !(minecraft.currentScreen instanceof DoubleChestScreen)
+		) {
+			itemStack = inventoryTweaks_handleShiftClickIntoContainer(syncId, slotId, button, true, player, clickedSlot);
+			System.out.println("ItemStack2: " + itemStack);
+		} else {
+			itemStack = this.minecraft.interactionManager.clickSlot(syncId, slotId, button, shift, player);
+			System.out.println("ItemStack1: " + itemStack);
+		}
+
+		return itemStack;
+	}
+
+	@Unique private ItemStack inventoryTweaks_handleShiftClickIntoContainer(int syncId, int slotId, int button, boolean shift, PlayerEntity player, Slot clickedSlot) {
+		ItemStack itemStack = null;
+		HandledScreen handledScreen = (HandledScreen) minecraft.currentScreen;
+
+		/** - Check if container is valid for shifting */
+		for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
+			if (!handledScreen.container.slots.get(slotIndex).getClass().equals(Slot.class))
+			{
+				System.out.println("Container is INVALID!");
+				return this.minecraft.interactionManager.clickSlot(syncId, slotId, button, shift, player);
+			}
+		}
+
+		if (null != clickedSlot && clickedSlot.hasStack()) {
+			int totalSlots = handledScreen.container.slots.size();
+			int numberOfContainerSlots = totalSlots - 36;
+
+			/** - Check if items should be shifted into or out of the container */
+			if (clickedSlot.id < numberOfContainerSlots) {
+				ItemStack slotStack = clickedSlot.getStack();
+				ItemStack cursorStack = minecraft.player.inventory.getCursorStack();
+				int originalStackCount = (null != cursorStack) ? cursorStack.count : 0;
+				int shiftToSlot;
+				int isSlotAvailable;
+				boolean itemsShifted = false;
+				boolean shiftingFinished = false;
+
+				/** - Shift item from container back into player inventory */
+				for (int slotIndex = 0; slotIndex < (handledScreen.container.slots.size() - numberOfContainerSlots); slotIndex++) {
+					shiftToSlot = (handledScreen.container.slots.size() - slotIndex) - 1;
+					isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) handledScreen.container.slots.get(shiftToSlot)));
+
+					if (0 == isSlotAvailable) {
+						/** - Partially full item slot of matching item found. */
+						if (null != minecraft.player.inventory.getCursorStack()) {
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+						}
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot) handledScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+						itemsShifted = true;
+						if (false == clickedSlot.hasStack()) {
+							shiftingFinished = true;
+							break;
+						}
+					}
+				}
+
+				if (false == shiftingFinished) {
+					for (int slotIndex = 0; slotIndex < (handledScreen.container.slots.size() - numberOfContainerSlots); slotIndex++) {
+						shiftToSlot = (handledScreen.container.slots.size() - slotIndex) - 1;
+						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) handledScreen.container.slots.get(shiftToSlot)));
+
+						if (1 == isSlotAvailable) {
+							/** - Empty slot found! */
+							if (null != minecraft.player.inventory.getCursorStack()) {
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot) handledScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							} else {
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot) handledScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+							}
+							itemsShifted = true;
+							break;
+						}
+					}
+				}
+
+				if (itemsShifted) {
+					//return true;
+				}
+			} else {
+				ItemStack slotStack = clickedSlot.getStack();
+				int isSlotAvailable;
+				boolean itemsShifted = false;
+				boolean shiftingFinished = false;
+
+				/** - Shift item into container */
+				for (int slotIndex = 0; slotIndex < numberOfContainerSlots; slotIndex++) {
+					isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) handledScreen.container.slots.get(slotIndex)));
+					if (0 == isSlotAvailable) {
+						/** - Partially full item slot of matching item found. */
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(slotIndex)).id, button, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+						itemsShifted = true;
+						if (false == clickedSlot.hasStack()) {
+							shiftingFinished = true;
+							break;
+						}
+					}
+				}
+
+				if (false == shiftingFinished) {
+					for (int slotIndex = 0; slotIndex < numberOfContainerSlots; slotIndex++) {
+						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot)handledScreen.container.slots.get(slotIndex)));
+
+						if (1 == isSlotAvailable) {
+							/** - Empty slot found! */
+							if (null != minecraft.player.inventory.getCursorStack()) {
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(slotIndex)).id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							} else {
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(slotIndex)).id, button, false, this.minecraft.player);
+							}
+							itemsShifted = true;
+							break;
+						}
+					}
+				}
+
+				if (itemsShifted) {
+					//return true;
+				}
+			}
+		}
+
+		return itemStack;
+	}
+
 	@Unique private boolean inventoryTweaks_handleShiftClickIntoDispenser(int mouseX, int mouseY, int button, Slot clickedSlot) {
 		boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
 		if (isShiftKeyDown) {
 
 			if (null != clickedSlot && clickedSlot.hasStack()) {
 				DispenserScreen dispenserScreen = (DispenserScreen) minecraft.currentScreen;
+				int totalSlots = dispenserScreen.container.slots.size();
+				int numberOfContainerSlots = totalSlots - 36;
 
-				if (  (clickedSlot != ((Slot)dispenserScreen.container.slots.get(0)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(1)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(2)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(3)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(4)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(5)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(6)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(7)))
-				   && (clickedSlot != ((Slot)dispenserScreen.container.slots.get(8)))
-				) {
+				if (clickedSlot.id >= numberOfContainerSlots) {
 					ItemStack slotStack = clickedSlot.getStack();
 					int isSlotAvailable;
 					int dispenserSlotIndex;
 					boolean itemsShifted = false;
+					boolean shiftingFinished = false;
 
+					/** - Shift item into container */
 					for (dispenserSlotIndex = 0; dispenserSlotIndex < 9; dispenserSlotIndex++) {
-						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)));
-
+						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) dispenserScreen.container.slots.get(dispenserSlotIndex)));
 						if (0 == isSlotAvailable) {
 							/** - Partially full item slot of matching item found. */
 							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
@@ -501,20 +674,29 @@ public abstract class ContainerBaseMixin extends Screen {
 							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
 							itemsShifted = true;
 							if (false == clickedSlot.hasStack()) {
+								shiftingFinished = true;
 								break;
 							}
-						} else if (1 == isSlotAvailable) {
-							/** - Empty slot found! */
-							if (null != minecraft.player.inventory.getCursorStack()) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)).id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-							} else {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)).id, button, false, this.minecraft.player);
+						}
+					}
+
+					if (false == shiftingFinished) {
+						for (dispenserSlotIndex = 0; dispenserSlotIndex < 9; dispenserSlotIndex++) {
+							isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)));
+
+							if (1 == isSlotAvailable) {
+								/** - Empty slot found! */
+								if (null != minecraft.player.inventory.getCursorStack()) {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)).id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								} else {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(dispenserSlotIndex)).id, button, false, this.minecraft.player);
+								}
+								itemsShifted = true;
+								break;
 							}
-							itemsShifted = true;
-							break;
 						}
 					}
 
@@ -527,33 +709,44 @@ public abstract class ContainerBaseMixin extends Screen {
 					int shiftToSlot;
 					int isSlotAvailable;
 					boolean itemsShifted = false;
+					boolean shiftingFinished = false;
 
 					/** - Shift item back into player inventory */
 					for (playerInventorySlotIndex = 0; playerInventorySlotIndex < (dispenserScreen.container.slots.size() - 9); playerInventorySlotIndex++) {
 						shiftToSlot = (dispenserScreen.container.slots.size() - playerInventorySlotIndex) - 1;
-						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)));
+						isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) dispenserScreen.container.slots.get(shiftToSlot)));
 
 						if (0 == isSlotAvailable) {
 							/** - Partially full item slot of matching item found. */
 							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot) dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
 							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
 							itemsShifted = true;
 							if (false == clickedSlot.hasStack()) {
+								shiftingFinished = true;
 								break;
 							}
-						} else if (1 == isSlotAvailable) {
-							/** - Empty slot found! */
-							if (null != minecraft.player.inventory.getCursorStack()) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-							} else {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+						}
+					}
+
+					if (false == shiftingFinished) {
+						for (playerInventorySlotIndex = 0; playerInventorySlotIndex < (dispenserScreen.container.slots.size() - 9); playerInventorySlotIndex++) {
+							shiftToSlot = (dispenserScreen.container.slots.size() - playerInventorySlotIndex) - 1;
+							isSlotAvailable = ModHelper.canItemFitInSlot(slotStack, ((Slot) dispenserScreen.container.slots.get(shiftToSlot)));
+
+							if (1 == isSlotAvailable) {
+								/** - Empty slot found! */
+								if (null != minecraft.player.inventory.getCursorStack()) {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot) dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								} else {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot) dispenserScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+								}
+								itemsShifted = true;
+								break;
 							}
-							itemsShifted = true;
-							break;
 						}
 					}
 
@@ -567,14 +760,12 @@ public abstract class ContainerBaseMixin extends Screen {
 		return false;
 	}
 
-
 	@Unique private boolean inventoryTweaks_handleDoubleClickEmptyCursor(int mouseX, int mouseY, int button, Slot clickedSlot) {
 		if (null != clickedSlot) {
 			HandledScreen handledScreen = (HandledScreen) minecraft.currentScreen;
 
 			ItemStack slotStack = minecraft.player.inventory.getCursorStack();
 			int playerInventorySlotIndex;
-			System.out.println("B: " + minecraft.player.inventory.getCursorStack());
 
 			/** - Shift item back into player inventory */
 			for (playerInventorySlotIndex = 0; playerInventorySlotIndex < handledScreen.container.slots.size(); playerInventorySlotIndex++) {
@@ -604,6 +795,46 @@ public abstract class ContainerBaseMixin extends Screen {
 				) {
 					/** - Stack is full */
 					break;
+				}
+			}
+
+			/** - Still pick up the item even if no items are shifted */
+			return true;
+		}
+
+		return false;
+	}
+
+	@Unique private boolean inventoryTweaks_handleDoubleClickWithItem(int mouseX, int mouseY, int button, Slot clickedSlot) {
+		if (null != clickedSlot) {
+			HandledScreen handledScreen = (HandledScreen) minecraft.currentScreen;
+
+			ItemStack slotStack = minecraft.player.inventory.getCursorStack();
+			int slotIndex;
+			if (clickedSlot.id < (handledScreen.container.slots.size() - 36)) {
+				System.out.println("Slot Id Chest: " + clickedSlot.id);
+				for (slotIndex = 0; slotIndex < (handledScreen.container.slots.size() - 36); slotIndex++) {
+					ItemStack itemStack = ((Slot)handledScreen.container.slots.get(slotIndex)).getStack();
+					if (itemStack != null && itemStack.itemId == leftClickPersistentStackShiftInventories.itemId) {
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(slotIndex)).id, 0, true, this.minecraft.player);
+						ItemStack itemStackAfterShift = ((Slot)handledScreen.container.slots.get(slotIndex)).getStack();
+						if (itemStackAfterShift != null) {
+							break;
+						}
+					}
+				}
+
+			} else {
+				System.out.println("Slot Id Player: " + clickedSlot.id);
+				for (slotIndex = (handledScreen.container.slots.size() - 36); slotIndex < handledScreen.container.slots.size(); slotIndex++) {
+					ItemStack itemStack = ((Slot)handledScreen.container.slots.get(slotIndex)).getStack();
+					if (itemStack != null && itemStack.itemId == leftClickPersistentStackShiftInventories.itemId) {
+						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(slotIndex)).id, 0, true, this.minecraft.player);
+						ItemStack itemStackAfterShift = ((Slot)handledScreen.container.slots.get(slotIndex)).getStack();
+						if (itemStackAfterShift != null) {
+							break;
+						}
+					}
 				}
 			}
 
@@ -1037,7 +1268,16 @@ public abstract class ContainerBaseMixin extends Screen {
 			lastLMBSlot = clickedSlot;
 			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.LMBPreferShiftClick) {
 				boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
-				this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
+				if (isShiftKeyDown && minecraft.currentScreen instanceof DispenserScreen) {
+					System.out.println("Pokeeiejoejoei");
+					/** - Handle shift click into dispenser */
+					if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoDispensers) {
+						inventoryTweaks_handleShiftClickIntoDispenser(0, 0, 0, clickedSlot);
+					}
+				} else {
+					this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
+				}
+
 
 				if (isShiftKeyDown) {
 					inventoryTweaks_resetLeftClickDragVariables();
@@ -1095,7 +1335,15 @@ public abstract class ContainerBaseMixin extends Screen {
 						if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
 							if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.LMBTweakShiftClick)
 							{
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, true, this.minecraft.player);
+								if (minecraft.currentScreen instanceof DispenserScreen) {
+									System.out.println("Pokeeiejoejoei");
+									/** - Handle shift click into dispenser */
+									if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.EnableShiftClickingItemsIntoDispensers) {
+										inventoryTweaks_handleShiftClickIntoDispenser(0, 0, 0, slot);
+									}
+								} else {
+									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, true, this.minecraft.player);
+								}
 							}
 						} else {
 							if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.LMBTweakPickUp) {
