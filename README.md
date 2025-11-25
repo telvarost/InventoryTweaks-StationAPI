@@ -22,9 +22,8 @@ This mod is incompatible with the regular version of MojangFix. If you would lik
 ### Modern Minecraft Changes
 * Adds modern double `Left-Click` to fill empty cursor with picked up item (searches open inventory screen for the item to fill the cursor).
 * Adds `Shift + Click` to move armor onto player armor slots when in player inventory.
-* Adds `Shift + Click` to move items into and out of dispensers when in dispenser inventories.
+* Adds `Shift + Click` to move items into and out of dispensers when in dispenser inventories (only works in single-player).
 * Adds `Shift + Click` to move smeltable/fuel items into furnaces when furnace screen is open (same behavior as modern, logs will go into smelt slot rather than fuel slot).
-* Adds `Shift + Click` to move items into and out of crates when [Crates](https://modrinth.com/mod/crate) mod is loaded.
 * Adds `Left-Click + Drag` mechanic to evenly distribute held items over empty slots/slots with the same item as in modern Minecraft.
 * Adds `Right-Click + Drag` mechanic to distribute one item from held items over empty slots/slots with the same item as in modern Minecraft.
 * `LCtrl + DROP_KEY` to drop a whole stack of items.
