@@ -69,6 +69,13 @@ public class Config {
         @ConfigEntry(name = "Enable [Right-Click + Drag]")
         public Boolean EnableRightClickDrag = true;
 
+        @ConfigEntry(
+                name = "Multiplayer [Shift-Clicking] into dispensers",
+                description = "Must be installed on the server also to work",
+                multiplayerSynced = true
+        )
+        public Boolean MultiplayerShiftClickingItemsIntoDispensers = false;
+
         @ConfigEntry(name = "Prefer [Shift-Click] over [Left-Click + Drag]")
         public Boolean LMBPreferShiftClick = true;
 

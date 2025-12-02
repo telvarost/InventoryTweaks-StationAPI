@@ -1,5 +1,8 @@
 package com.github.telvarost.inventorytweaks.mixin;
 
+import com.github.telvarost.inventorytweaks.Config;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.DispenserScreenHandler;
@@ -15,7 +18,11 @@ public abstract class DispenserScreenHandlerMixin extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(int slot) {
-        if (null != dispenserBlockEntity.world) {
+        if (  (  (null != dispenserBlockEntity.world)
+              && (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT)
+              )
+           || (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.MultiplayerShiftClickingItemsIntoDispensers)
+        ) {
             ItemStack slotItemCopy = null;
             Slot clickedSlot = (Slot)this.slots.get(slot);
 
