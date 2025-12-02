@@ -107,7 +107,7 @@ dependencies {
 		transitive false
 	}
 
-	modImplementation("com.github.paulevsGitch:BHCreative:${project.bhcreative_version}"){
+	modImplementation("com.github.paulevsGitch:BHCreative:${project.bhcreative_version}") {
 		transitive false
 	}
 
