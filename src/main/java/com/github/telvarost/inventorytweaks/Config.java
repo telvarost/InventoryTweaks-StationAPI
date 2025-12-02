@@ -10,13 +10,13 @@ public class Config {
     public static class InventoryTweaksConfig {
 
         @ConfigCategory(name = "Crafting Result Config")
-        public static final CraftingResultConfig CRAFTING_RESULT_CONFIG = new CraftingResultConfig();
+        public CraftingResultConfig CRAFTING_RESULT_CONFIG = new CraftingResultConfig();
 
         @ConfigCategory(name = "Modern Minecraft Config")
-        public static final ModernMinecraftConfig MODERN_MINECRAFT_CONFIG = new ModernMinecraftConfig();
+        public ModernMinecraftConfig MODERN_MINECRAFT_CONFIG = new ModernMinecraftConfig();
 
         @ConfigCategory(name = "MouseTweaks Config")
-        public static final MouseTweaksConfig MOUSE_TWEAKS_CONFIG = new MouseTweaksConfig();
+        public MouseTweaksConfig MOUSE_TWEAKS_CONFIG = new MouseTweaksConfig();
     }
 
     public static class CraftingResultConfig {
@@ -51,17 +51,8 @@ public class Config {
         @ConfigEntry(name = "Allow [Shift-Clicking] items into armor slots")
         public Boolean EnableShiftClickingItemsIntoArmorSlots = true;
 
-        @ConfigEntry(name = "Allow [Shift-Clicking] items into dispensers")
-        public Boolean EnableShiftClickingItemsIntoDispensers = true;
-
         @ConfigEntry(name = "Allow [Shift-Clicking] items into furnaces")
         public Boolean EnableShiftClickingItemsIntoFurnaces = true;
-
-        @ConfigEntry(
-                name = "Allow [Shift-Clicking] items into mod crates",
-                description = "Requires crates mod by Slainlight"
-        )
-        public Boolean EnableShiftClickingItemsIntoCrates = true;
 
         @ConfigEntry(
                 name = "Double [Left-Click] Fill Cursor Stack",
@@ -77,6 +68,13 @@ public class Config {
 
         @ConfigEntry(name = "Enable [Right-Click + Drag]")
         public Boolean EnableRightClickDrag = true;
+
+        @ConfigEntry(
+                name = "Multiplayer [Shift-Clicking] into dispensers",
+                description = "Must be installed on the server also to work",
+                multiplayerSynced = true
+        )
+        public Boolean MultiplayerShiftClickingItemsIntoDispensers = false;
 
         @ConfigEntry(name = "Prefer [Shift-Click] over [Left-Click + Drag]")
         public Boolean LMBPreferShiftClick = true;
