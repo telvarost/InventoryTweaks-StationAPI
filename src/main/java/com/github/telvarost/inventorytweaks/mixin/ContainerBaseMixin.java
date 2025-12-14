@@ -338,7 +338,7 @@ public abstract class ContainerBaseMixin extends Screen {
 								shiftToSlot = 8;
 							}
 						}
-					} else if (Block.PUMPKIN.asItem().id == slotStack.itemId) {
+					} else if (Block.PUMPKIN.id == slotStack.itemId) {
 						if (false == ((Slot)inventoryScreen.container.slots.get(5)).hasStack()) {
 							shiftToSlot = 5;
 							isPumpkin = true;
