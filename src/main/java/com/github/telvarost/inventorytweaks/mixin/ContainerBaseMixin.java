@@ -44,7 +44,7 @@ public abstract class ContainerBaseMixin extends Screen {
 	protected int backgroundHeight;
 
 	@Shadow
-	public net.minecraft.screen.ScreenHandler container;
+	public net.minecraft.screen.ScreenHandler handler;
 
 	@Shadow
 	protected abstract Slot getSlotAt(int x, int y);
@@ -243,7 +243,7 @@ public abstract class ContainerBaseMixin extends Screen {
 			for (int craftingAttempts = 0; craftingAttempts < 256; craftingAttempts++) {
 				if (clickedSlot.hasStack() && numCrafted < maxStackSize) {
 					numCrafted += clickedSlot.getStack().count;
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, true, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, true, this.minecraft.player);
 				} else {
 					break;
 				}
@@ -309,10 +309,10 @@ public abstract class ContainerBaseMixin extends Screen {
 			if (null != clickedSlot && clickedSlot.hasStack()) {
 				InventoryScreen inventoryScreen = (InventoryScreen) minecraft.currentScreen;
 
-				if (  (clickedSlot != ((Slot)inventoryScreen.container.slots.get(5)))
-				   && (clickedSlot != ((Slot)inventoryScreen.container.slots.get(6)))
-				   && (clickedSlot != ((Slot)inventoryScreen.container.slots.get(7)))
-				   && (clickedSlot != ((Slot)inventoryScreen.container.slots.get(8)))
+				if (  (clickedSlot != ((Slot)inventoryScreen.handler.slots.get(5)))
+				   && (clickedSlot != ((Slot)inventoryScreen.handler.slots.get(6)))
+				   && (clickedSlot != ((Slot)inventoryScreen.handler.slots.get(7)))
+				   && (clickedSlot != ((Slot)inventoryScreen.handler.slots.get(8)))
 				) {
 					ItemStack slotStack = clickedSlot.getStack();
 					int shiftToSlot = -1;
@@ -322,24 +322,24 @@ public abstract class ContainerBaseMixin extends Screen {
 						int equipmentSlot = ((ArmorItem)slotStack.getItem()).equipmentSlot;
 
 						if (0 == equipmentSlot) {
-							if (false == ((Slot)inventoryScreen.container.slots.get(5)).hasStack()) {
+							if (false == ((Slot)inventoryScreen.handler.slots.get(5)).hasStack()) {
 								shiftToSlot = 5;
 							}
 						} else if (1 == equipmentSlot) {
-							if (false == ((Slot)inventoryScreen.container.slots.get(6)).hasStack()) {
+							if (false == ((Slot)inventoryScreen.handler.slots.get(6)).hasStack()) {
 								shiftToSlot = 6;
 							}
 						} else if (2 == equipmentSlot) {
-							if (false == ((Slot)inventoryScreen.container.slots.get(7)).hasStack()) {
+							if (false == ((Slot)inventoryScreen.handler.slots.get(7)).hasStack()) {
 								shiftToSlot = 7;
 							}
 						} else if (3 == equipmentSlot) {
-							if (false == ((Slot)inventoryScreen.container.slots.get(8)).hasStack()) {
+							if (false == ((Slot)inventoryScreen.handler.slots.get(8)).hasStack()) {
 								shiftToSlot = 8;
 							}
 						}
 					} else if (Block.PUMPKIN.id == slotStack.itemId) {
-						if (false == ((Slot)inventoryScreen.container.slots.get(5)).hasStack()) {
+						if (false == ((Slot)inventoryScreen.handler.slots.get(5)).hasStack()) {
 							shiftToSlot = 5;
 							isPumpkin = true;
 						}
@@ -347,20 +347,20 @@ public abstract class ContainerBaseMixin extends Screen {
 
 					if (0 <= shiftToSlot) {
 						if (null != minecraft.player.inventory.getCursorStack()) {
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)inventoryScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)inventoryScreen.handler.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, false, this.minecraft.player);
 						} else {
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)inventoryScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)inventoryScreen.handler.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
 
 							if (isPumpkin) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, button, false, this.minecraft.player);
 							}
 						}
 
 						if (isPumpkin) {
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, button, true, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, button, true, this.minecraft.player);
 						}
 
 						return true;
@@ -379,9 +379,9 @@ public abstract class ContainerBaseMixin extends Screen {
 			if (null != clickedSlot && clickedSlot.hasStack()) {
 				FurnaceScreen furnaceScreen = (FurnaceScreen) minecraft.currentScreen;
 
-				if (  (clickedSlot != ((Slot)furnaceScreen.container.slots.get(0)))
-				   && (clickedSlot != ((Slot)furnaceScreen.container.slots.get(1)))
-				   && (clickedSlot != ((Slot)furnaceScreen.container.slots.get(2)))
+				if (  (clickedSlot != ((Slot)furnaceScreen.handler.slots.get(0)))
+				   && (clickedSlot != ((Slot)furnaceScreen.handler.slots.get(1)))
+				   && (clickedSlot != ((Slot)furnaceScreen.handler.slots.get(2)))
 				) {
 					try {
 						ItemStack slotStack = clickedSlot.getStack();
@@ -389,13 +389,13 @@ public abstract class ContainerBaseMixin extends Screen {
 
 						if (FabricLoader.getInstance().isModLoaded("stationapi")) {
 							if (null != ModHelperStationAPI.getResultFor(slotStack)) {
-								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
+								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.handler.slots.get(0)))) {
 									shiftToSlot = 0;
 								} else {
 									shiftToSlot = -2;
 								}
 							} else if (0 < ModHelperStationAPI.getFuelTime(slotStack)) {
-								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
+								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.handler.slots.get(1)))) {
 									shiftToSlot = 1;
 								} else {
 									shiftToSlot = -2;
@@ -403,7 +403,7 @@ public abstract class ContainerBaseMixin extends Screen {
 							}
 						} else {
 							if (null != SmeltingRecipeManager.getInstance().craft(slotStack.getItem().id)) {
-								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(0)))) {
+								if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.handler.slots.get(0)))) {
 									shiftToSlot = 0;
 								} else {
 									shiftToSlot = -2;
@@ -412,7 +412,7 @@ public abstract class ContainerBaseMixin extends Screen {
 								FurnaceBlockEntity furnace = ((FurnaceScreenAccessor)furnaceScreen).getFurnaceBlockEntity();
 
 								if (0 < ((FurnaceBlockEntityAccessor)furnace).inventoryTweaks_getFuelTime(slotStack)) {
-									if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.container.slots.get(1)))) {
+									if (0 <= ModHelper.canItemFitInSlot(slotStack, ((Slot)furnaceScreen.handler.slots.get(1)))) {
 										shiftToSlot = 1;
 									} else {
 										shiftToSlot = -2;
@@ -425,14 +425,14 @@ public abstract class ContainerBaseMixin extends Screen {
 							return true;
 						} else if (0 <= shiftToSlot) {
 							if (null != minecraft.player.inventory.getCursorStack()) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)furnaceScreen.handler.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, false, this.minecraft.player);
 							} else {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)furnaceScreen.container.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)furnaceScreen.handler.slots.get(shiftToSlot)).id, button, false, this.minecraft.player);
 								if (null != minecraft.player.inventory.getCursorStack()) {
-									this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, button, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, button, false, this.minecraft.player);
 								}
 							}
 
@@ -456,21 +456,21 @@ public abstract class ContainerBaseMixin extends Screen {
 			int playerInventorySlotIndex;
 
 			/** - Shift item back into player inventory */
-			for (playerInventorySlotIndex = 0; playerInventorySlotIndex < handledScreen.container.slots.size(); playerInventorySlotIndex++) {
+			for (playerInventorySlotIndex = 0; playerInventorySlotIndex < handledScreen.handler.slots.size(); playerInventorySlotIndex++) {
 
-				if (ModHelper.isItemInSlot(slotStack, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)))) {
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
+				if (ModHelper.isItemInSlot(slotStack, ((Slot)handledScreen.handler.slots.get(playerInventorySlotIndex)))) {
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)handledScreen.handler.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)handledScreen.handler.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
 
-					ItemStack itemStack = ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).getStack();
+					ItemStack itemStack = ((Slot)handledScreen.handler.slots.get(playerInventorySlotIndex)).getStack();
 					if (  null != itemStack
 					   && itemStack.getItem().getMaxCount() == itemStack.count
 					) {
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, ((Slot)handledScreen.container.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)handledScreen.handler.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.handler.syncId, ((Slot)handledScreen.handler.slots.get(playerInventorySlotIndex)).id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 0, false, this.minecraft.player);
 
 						/** - Stack is full */
 						break;
@@ -511,7 +511,7 @@ public abstract class ContainerBaseMixin extends Screen {
 
 			if (var8 != -1) {
 				boolean var9 = var8 != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
-				this.minecraft.interactionManager.clickSlot(this.container.syncId, var8, button, var9, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.handler.syncId, var8, button, var9, this.minecraft.player);
 			}
 		}
 	}
@@ -622,9 +622,9 @@ public abstract class ContainerBaseMixin extends Screen {
 			}
 
 			/** - Prevent illegal transfers that can cause bugs/dupes */
-			if (  (slot.id == 0) && (container instanceof CraftingScreenHandler)
-			   || (slot.id == 2) && (container instanceof FurnaceScreenHandler)
-			   || (  (container instanceof PlayerScreenHandler)
+			if (  (slot.id == 0) && (handler instanceof CraftingScreenHandler)
+			   || (slot.id == 2) && (handler instanceof FurnaceScreenHandler)
+			   || (  (handler instanceof PlayerScreenHandler)
 				  && (  (slot.id == 0)
 					 ||	(slot.id == 5)
 					 ||	(slot.id == 6)
@@ -698,15 +698,15 @@ public abstract class ContainerBaseMixin extends Screen {
 //			numTurns *= -1;
 //		}
 //
-//		if (minecraft.player.container == minecraft.player.playerContainer) {
-//			System.out.println("Only one container exists");
+//		if (minecraft.player.handler == minecraft.player.playerContainer) {
+//			System.out.println("Only one handler exists");
 //		}
 //
 //		if (0 > numTurns) {
 //			/** - Transfer items out of slot */
 //			if (0 != slotAmount) {
-//				for (int containerIndex = 0; containerIndex < minecraft.player.container.slots.lastIndexOf(Slot) - 1; containerIndex++) {
-//					Slot curSlot = (Slot)minecraft.player.playerContainer.slots.get(containerIndex);
+//				for (int handlerIndex = 0; handlerIndex < minecraft.player.handler.slots.lastIndexOf(Slot) - 1; handlerIndex++) {
+//					Slot curSlot = (Slot)minecraft.player.playerContainer.slots.get(handlerIndex);
 ////					ItemInstance curSlotItem = curSlot.getItem();
 ////					int curSlotAmount = (null != curSlotItem) ? curSlotItem.count : 0;
 ////
@@ -744,7 +744,7 @@ public abstract class ContainerBaseMixin extends Screen {
 ////				for (int turnIndex = 0; turnIndex < abs(numTurns); turnIndex++) {
 ////				}
 //				System.out.println("Scroll up");
-//				Slot slotToModify = (Slot)minecraft.player.container.slots.get(0);
+//				Slot slotToModify = (Slot)minecraft.player.handler.slots.get(0);
 //
 //				slotToModify.setStack(new ItemInstance(transferItem.itemId, 7, transferItem.getDamage()));
 //			}
@@ -786,13 +786,13 @@ public abstract class ContainerBaseMixin extends Screen {
 				lastRMBSlot = clickedSlot;
 				if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.RMBPreferShiftClick) {
 					boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 1, isShiftKeyDown, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 1, isShiftKeyDown, this.minecraft.player);
 
 					if (isShiftKeyDown) {
 						inventoryTweaks_resetRightClickDragVariables();
 					}
 				} else {
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 1, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 1, false, this.minecraft.player);
 				}
 
 				return true;
@@ -809,7 +809,7 @@ public abstract class ContainerBaseMixin extends Screen {
 			if (null != cursorStack ) {
 				/** - Distribute one item to the slot */
 				lastRMBSlotId = slot.id;
-				this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 1, false, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 1, false, this.minecraft.player);
 			}
 		}
 	}
@@ -837,7 +837,7 @@ public abstract class ContainerBaseMixin extends Screen {
 
 			/** - Distribute one item to the slot */
 			lastRMBSlotId = slot.id;
-			this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 1, false, this.minecraft.player);
+			this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 1, false, this.minecraft.player);
 		}
 	}
 
@@ -916,7 +916,7 @@ public abstract class ContainerBaseMixin extends Screen {
 			lastLMBSlot = clickedSlot;
 			if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.LMBPreferShiftClick) {
 				boolean isShiftKeyDown = (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT));
-				this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
 
 				if (isShiftKeyDown) {
 					inventoryTweaks_resetLeftClickDragVariables();
@@ -924,7 +924,7 @@ public abstract class ContainerBaseMixin extends Screen {
 					isLeftClickDragMouseTweaksStarted = true;
 				}
 			} else {
-				this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, false, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 0, false, this.minecraft.player);
 			}
 
 			return true;
@@ -949,7 +949,7 @@ public abstract class ContainerBaseMixin extends Screen {
 			/** - Handle initial Left-click */
 			lastLMBSlotId = clickedSlot.id;
 			lastLMBSlot = clickedSlot;
-			this.minecraft.interactionManager.clickSlot(this.container.syncId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
+			this.minecraft.interactionManager.clickSlot(this.handler.syncId, clickedSlot.id, 0, isShiftKeyDown, this.minecraft.player);
 
 			return true;
 		} else {
@@ -974,7 +974,7 @@ public abstract class ContainerBaseMixin extends Screen {
 						if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
 							if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.LMBTweakShiftClick)
 							{
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, true, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, true, this.minecraft.player);
 							}
 						} else {
 							if (Config.INVENTORY_TWEAKS_CONFIG.MOUSE_TWEAKS_CONFIG.LMBTweakPickUp) {
@@ -982,20 +982,20 @@ public abstract class ContainerBaseMixin extends Screen {
 
 								if (cursorStack == null) {
 									/** - Pick up items from slot */
-									this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
+									this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 								} else if (cursorStack.count < leftClickMouseTweaksPersistentStack.getMaxCount()) {
 									int amountAbleToPickUp = leftClickMouseTweaksPersistentStack.getMaxCount() - cursorStack.count;
 									int amountInSlot = slotItemToExamine.count;
 
 									/** - Pick up items from slot */
 									if (amountInSlot <= amountAbleToPickUp) {
-										this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
-										this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
+										this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
+										this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 									} else if (cursorStack.count == leftClickMouseTweaksPersistentStack.getMaxCount()) {
 										slot.setStack(new ItemStack(leftClickMouseTweaksPersistentStack.itemId, cursorStack.count, leftClickMouseTweaksPersistentStack.getDamage()));
 										minecraft.player.inventory.setCursorStack(new ItemStack(leftClickMouseTweaksPersistentStack.itemId, amountInSlot, leftClickMouseTweaksPersistentStack.getDamage()));
 									} else {
-										this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
+										this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 
 										slotItemToExamine = slot.getStack();
 										cursorStack = minecraft.player.inventory.getCursorStack();
@@ -1013,7 +1013,7 @@ public abstract class ContainerBaseMixin extends Screen {
 						     || (Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
 				             )
 				) {
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, true, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, true, this.minecraft.player);
 				}
 			}
 		}
@@ -1101,7 +1101,7 @@ public abstract class ContainerBaseMixin extends Screen {
 									if (0 != leftClickAmountToFill.get(slotsToCheckIndex) && leftClickAmountToFill.get(slotsToCheckIndex) < itemsPerSlot) {
 										/** - Just fill the slot and return */
 										for (int fillTheAmountIndex = 0; fillTheAmountIndex < leftClickAmountToFill.get(slotsToCheckIndex); fillTheAmountIndex++) {
-											this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get(slotsToCheckIndex).id, 1, false, this.minecraft.player);
+											this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get(slotsToCheckIndex).id, 1, false, this.minecraft.player);
 										}
 
 										leftClickRemainingItemAmount = leftClickRemainingItemAmount - leftClickAmountToFill.get(slotsToCheckIndex);
@@ -1122,9 +1122,9 @@ public abstract class ContainerBaseMixin extends Screen {
 						{
 							if (cursorStack != null)
 							{
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
 							}
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
 						}
 					}
 				}
@@ -1134,13 +1134,13 @@ public abstract class ContainerBaseMixin extends Screen {
 					if (isClientOnServer) {
 						if (0 != leftClickAmountToFillPersistent.get(distributeSlotsIndex)) {
 							for (int addSlotIndex = 0; addSlotIndex < itemsPerSlot; addSlotIndex++) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get(distributeSlotsIndex).id, 1, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get(distributeSlotsIndex).id, 1, false, this.minecraft.player);
 							}
 						}
 					} else {
 						if (0 != leftClickAmountToFill.get(distributeSlotsIndex)) {
 							for (int addSlotIndex = 0; addSlotIndex < itemsPerSlot; addSlotIndex++) {
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get(distributeSlotsIndex).id, 1, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get(distributeSlotsIndex).id, 1, false, this.minecraft.player);
 							}
 						}
 					}
@@ -1176,13 +1176,13 @@ public abstract class ContainerBaseMixin extends Screen {
 						{
 							if (cursorStack != null)
 							{
-								this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
+								this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
 							}
-							this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
+							this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get(leftClickHoveredSlotsIndex).id, 0, false, this.minecraft.player);
 						}
 					}
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get((leftClickHoveredSlots.size() - 1)).id, 0, false, this.minecraft.player);
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, leftClickHoveredSlots.get((leftClickHoveredSlots.size() - 1)).id, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get((leftClickHoveredSlots.size() - 1)).id, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, leftClickHoveredSlots.get((leftClickHoveredSlots.size() - 1)).id, 0, false, this.minecraft.player);
 				}
 
 				/** - Reset Left-click + Drag variables and exit function */
@@ -1244,13 +1244,13 @@ public abstract class ContainerBaseMixin extends Screen {
 					return;
 				}
 
-				this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 				if (Config.INVENTORY_TWEAKS_CONFIG.MODERN_MINECRAFT_CONFIG.LCtrlStackDrop) {
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, -999, Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) ? 0 : 1, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, -999, Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) ? 0 : 1, false, this.minecraft.player);
 				} else {
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, -999, 1, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, -999, 1, false, this.minecraft.player);
 				}
-				this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
+				this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 			}
 		}
 
@@ -1260,14 +1260,14 @@ public abstract class ContainerBaseMixin extends Screen {
 			}
 
 			if (keyCode >= Keyboard.KEY_1 && keyCode <= Keyboard.KEY_9) {
-				if (  (null != this.container.slots)
-				   && (10 <= this.container.slots.size())
+				if (  (null != this.handler.slots)
+				   && (10 <= this.handler.slots.size())
 				) {
 					if (this.minecraft.player.inventory.getCursorStack() == null) {
-						this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
+						this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 					}
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, (this.container.slots.size() - 10) + keyCode - 1, 0, false, this.minecraft.player);
-					this.minecraft.interactionManager.clickSlot(this.container.syncId, slot.id, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, (this.handler.slots.size() - 10) + keyCode - 1, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 				}
 			}
 		}
