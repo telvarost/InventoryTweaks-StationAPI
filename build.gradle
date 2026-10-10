@@ -119,11 +119,18 @@ dependencies {
 		}
 	}
 
-	if (project.hasProperty("retrocommands_version")) {
-		modImplementation("maven.modrinth:retrocommands:${project.retrocommands_version}-b1.7.3") {
-			transitive = false
-		}
-	}
+//	if (project.hasProperty("retrocommands_version")) {
+//		modImplementation("maven.modrinth:retrocommands:${project.retrocommands_version}-b1.7.3") {
+//			transitive = false
+//		}
+//	}
+	// Slainlight's utter nonsense (if using RetroCommands version 0.7.5+babric)
+	def retroCommandsJar = configurations.detachedConfiguration(
+			dependencies.create("maven.modrinth:retrocommands:${project.properties['retrocommands_version']}")
+	)
+	retroCommandsJar.transitive = false
+	modLocalRuntime files(zipTree(retroCommandsJar.singleFile).matching { include 'META-INF/jars/*.jar' }.files)
+
 
 	if (project.hasProperty("spawneggs_version")) {
 		modImplementation("net.danygames2014:spawneggs:${project.spawneggs_version}") {
