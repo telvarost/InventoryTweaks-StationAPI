@@ -1263,10 +1263,22 @@ public abstract class ContainerBaseMixin extends Screen {
 				if (  (null != this.handler.slots)
 				   && (10 <= this.handler.slots.size())
 				) {
+					int hotbarOffset;
+
+					if (  (minecraft.currentScreen instanceof InventoryScreen)
+					   && (45 <= this.handler.slots.size())
+					) {
+						// Hardcode the starting position of hotbar slots so that added slots from AccessoryAPI don't mangle things
+						hotbarOffset = 35;
+					} else {
+						// On other screens assume hotbar position is at the end of listed slots
+						hotbarOffset = this.handler.slots.size() - 10;
+					}
+
 					if (this.minecraft.player.inventory.getCursorStack() == null) {
 						this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 					}
-					this.minecraft.interactionManager.clickSlot(this.handler.syncId, (this.handler.slots.size() - 10) + keyCode - 1, 0, false, this.minecraft.player);
+					this.minecraft.interactionManager.clickSlot(this.handler.syncId, (hotbarOffset) + keyCode - 1, 0, false, this.minecraft.player);
 					this.minecraft.interactionManager.clickSlot(this.handler.syncId, slot.id, 0, false, this.minecraft.player);
 				}
 			}
